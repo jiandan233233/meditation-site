@@ -89,7 +89,7 @@ function initArticleForm() {
       id: Date.now(),
       title,
       category,
-      cover: cover || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop',
+      cover: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23FFB6C1"/><stop offset="100%" style="stop-color:%23FF8C42"/></linearGradient></defs><rect fill="url(%23g1)" width="400" height="225"/><text x="200" y="112" text-anchor="middle" fill="white" font-size="14">冥想</text></svg>',
       content,
       date: new Date().toLocaleDateString('zh-CN')
     };
@@ -127,7 +127,7 @@ function initVideoForm() {
       title,
       category,
       videoUrl,
-      cover: cover || 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=225&fit=crop',
+      cover: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23FFB6C1"/><stop offset="100%" style="stop-color:%23FF8C42"/></linearGradient></defs><rect fill="url(%23g1)" width="400" height="225"/><text x="200" y="112" text-anchor="middle" fill="white" font-size="14">冥想</text></svg>',
       description,
       date: new Date().toLocaleDateString('zh-CN')
     };

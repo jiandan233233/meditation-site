@@ -779,3 +779,207 @@ body {
     padding: 10px 12px;
   }
 }
+
+/* ========== 音频卡片样式 ========== */
+.audio-player {
+  background: var(--bg-light);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.audio-player-card {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.audio-cover {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFB6C1 0%, #FF8C42 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.audio-cover svg {
+  width: 32px;
+  height: 32px;
+  fill: white;
+  opacity: 0.9;
+}
+
+.audio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.audio-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 4px;
+}
+
+.audio-duration {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7B9E87 0%, #5B7E67 100%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.play-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: white;
+  margin-left: 2px;
+}
+
+.audio-progress {
+  flex: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.audio-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #7B9E87, #D4A574);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ========== 视频卡片占位样式 ========== */
+.video-placeholder {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: white;
+}
+
+.video-placeholder p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* ========== 文章卡片 ========== */
+.article-card {
+  background: var(--bg-light);
+  border-radius: 8px;
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background-color 0.2s;
+}
+
+.article-card:hover {
+  background: var(--border-color);
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.card-tag {
+  background: linear-gradient(135deg, #FFB6C1 0%, #FF8C42 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.article-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+
+.article-excerpt {
+  font-size: 14px;
+  color: var(--text-summary);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.read-more {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--link-color);
+}
+
+/* ========== 搜索结果 ========== */
+.search-result-item {
+  display: block;
+  padding: 16px;
+  background: var(--bg-light);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: 12px;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+  background: var(--border-color);
+}
+
+.search-result-type {
+  display: inline-block;
+  font-size: 12px;
+  color: white;
+  background: #7B9E87;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.search-result-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 4px;
+}
+
+.search-result-excerpt {
+  font-size: 14px;
+  color: var(--text-summary);
+}
