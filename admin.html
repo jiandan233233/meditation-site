@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后台管理 - 静心阁</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA LIVE</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item">首页</a>
+      <div class="nav-item nav-item-dropdown">
+        浏览内容
+        <div class="dropdown-menu">
+          <a href="lectures.html" class="dropdown-item">讲座开示</a>
+          <a href="videos.html" class="dropdown-item">视频专区</a>
+          <a href="literature.html" class="dropdown-item">经典文献文库</a>
+          <a href="activities.html" class="dropdown-item">各地活动分享</a>
+          <a href="downloads.html" class="dropdown-item">下载资料</a>
+        </div>
+      </div>
+      <a href="about.html" class="nav-item">关于本站</a>
+      <a href="admin.html" class="nav-item active">后台管理</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <div class="container">
+      <h1 style="font-size:20px;font-weight:500;margin-bottom:24px;">后台管理</h1>
+
+      <!-- Tab切换 -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="publishPanel">发布内容</button>
+        <button class="admin-tab" data-tab="managePanel">内容管理</button>
+      </div>
+
+      <!-- 发布内容面板 -->
+      <div class="admin-panel active" id="publishPanel">
+        <form id="publishForm">
+          <div class="form-group">
+            <label class="form-label">选择板块</label>
+            <select class="form-select" name="type">
+              <option value="lectures">讲座开示</option>
+              <option value="videos">视频专区</option>
+              <option value="literature">经典文献</option>
+              <option value="activities">各地活动</option>
+              <option value="downloads">下载资料</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">标题</label>
+              <input type="text" class="form-input" name="title" required placeholder="输入文章标题">
+            </div>
+            <div class="form-group">
+              <label class="form-label">发布日期</label>
+              <input type="date" class="form-input" name="date">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">分类标签</label>
+            <input type="text" class="form-input" name="category" placeholder="如：冥想入门、进阶教程等">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">简短摘要</label>
+            <textarea class="form-textarea" name="summary" placeholder="简要描述内容，控制在50字以内" style="min-height:60px;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">详细内容（支持粘贴图片）</label>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">在下方文本框中可以直接粘贴图片（Ctrl+V / Cmd+V）</p>
+            <textarea class="form-textarea" name="content" required placeholder="输入正文内容，支持HTML格式"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">封面图片（可选）</label>
+            <input type="file" class="form-input" id="coverImage" accept="image/*">
+          </div>
+
+          <div class="form-group" id="videoUrlGroup">
+            <label class="form-label">视频嵌入链接（仅视频区填写）</label>
+            <input type="text" class="form-input" name="videoUrl" placeholder="YouTube/B站视频链接或本地视频URL">
+          </div>
+
+          <div class="form-group" id="downloadUrlGroup">
+            <label class="form-label">下载链接（仅下载区填写）</label>
+            <input type="text" class="form-input" name="downloadUrl" placeholder="文件下载链接">
+          </div>
+
+          <button type="submit" class="submit-btn">发布内容</button>
+        </form>
+      </div>
+
+      <!-- 内容管理面板 -->
+      <div class="admin-panel" id="managePanel">
+        <div class="admin-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">编辑内容</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="editForm">
+        <input type="hidden" name="id">
+        <input type="hidden" name="type">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">标题</label>
+            <input type="text" class="form-input" name="title" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">发布日期</label>
+            <input type="date" class="form-input" name="date">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">分类标签</label>
+          <input type="text" class="form-input" name="category">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">简短摘要</label>
+          <textarea class="form-textarea" name="summary" style="min-height:60px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">详细内容</label>
+          <textarea class="form-textarea" name="content" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">视频嵌入链接</label>
+          <input type="text" class="form-input" name="videoUrl">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">下载链接</label>
+          <input type="text" class="form-input" name="downloadUrl">
+        </div>
+
+        <button type="submit" class="submit-btn">保存修改</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    // 根据选择的板块显示/隐藏特定字段
+    document.querySelector('select[name="type"]').addEventListener('change', function() {
+      const type = this.value;
+      const videoGroup = document.getElementById('videoUrlGroup');
+      const downloadGroup = document.getElementById('downloadUrlGroup');
+      
+      videoGroup.style.display = type === 'videos' ? 'block' : 'none';
+      downloadGroup.style.display = type === 'downloads' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

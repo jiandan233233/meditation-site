@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="搜索冥想资源 - 视频、音频、文章全文检索">
+  <title>搜索 - 静心阁</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="#7B9E87" stroke-width="2"/>
+          <circle cx="20" cy="20" r="12" stroke="#D4A574" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="5" fill="#7B9E87"/>
+        </svg>
+        <span class="logo-text">静心阁</span>
+      </a>
+      
+      <button class="menu-toggle" aria-label="菜单">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <nav class="nav">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="videos.html" class="nav-link">视频</a>
+        <a href="audios.html" class="nav-link">音频</a>
+        <a href="articles.html" class="nav-link">文章</a>
+        <a href="search.html" class="nav-link active">搜索</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Search Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">搜索资源</h1>
+      <p class="hero-subtitle">输入关键词，找到你需要的冥想内容</p>
+      
+      <div class="search-box" style="max-width: 600px;">
+        <input type="text" id="search-input" placeholder="搜索冥想、视频、音频、文章..." autofocus>
+        <button onclick="window.performGlobalSearch(document.getElementById('search-input').value)">
+          <svg viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search Results -->
+  <section class="search-results">
+    <div class="container">
+      <div id="search-results">
+        <!-- Results will be populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Links -->
+  <section class="content-section">
+    <div class="container">
+      <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">热门标签</h2>
+      <div class="filter-tabs">
+        <button class="filter-tab" onclick="window.performGlobalSearch('入门')">入门</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('呼吸')">呼吸</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('睡眠')">睡眠</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('放松')">放松</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('减压')">减压</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('正念')">正念</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('清晨')">清晨</button>
+        <button class="filter-tab" onclick="window.performGlobalSearch('感恩')">感恩</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-text">© 2024 静心阁 · 免费冥想资源 · 愿你找到内心的宁静</p>
+      <div class="footer-links">
+        <a href="admin/index.html" class="footer-link">管理后台</a>
+        <a href="search.html" class="footer-link">搜索</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

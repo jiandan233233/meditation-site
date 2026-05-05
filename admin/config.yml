@@ -1,0 +1,73 @@
+# Decap CMS 配置
+# 静心阁 - 冥想资源管理
+
+backend:
+  name: git-gateway
+  branch: main
+
+# 媒体文件存储位置
+media_folder: "assets/images"
+public_folder: "/assets/images"
+
+# 内容集合定义
+collections:
+  # 冥想文章
+  - name: "articles"
+    label: "文章"
+    label_singular: "文章"
+    folder: "content/articles"
+    create: true
+    slug: "{{slug}}"
+    extension: "html"
+    format: "html"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "分类", name: "category", widget: "select", options: ["入门指南", "技巧方法", "科学解读", "生活应用"] }
+      - { label: "标签", name: "tags", widget: "list" }
+      - { label: "摘要", name: "excerpt", widget: "text" }
+      - { label: "阅读时长", name: "readTime", widget: "string", hint: "如：8 分钟" }
+      - { label: "封面图片", name: "cover", widget: "image", required: false }
+      - { label: "内容", name: "body", widget: "markdown" }
+
+  # 冥想音频
+  - name: "audios"
+    label: "音频"
+    label_singular: "音频"
+    folder: "content/audios"
+    create: true
+    slug: "{{slug}}"
+    extension: "html"
+    format: "html"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "分类", name: "category", widget: "select", options: ["清晨唤醒", "放松减压", "睡前冥想", "呼吸练习"] }
+      - { label: "时长", name: "duration", widget: "string", hint: "如：5:30" }
+      - { label: "音频描述", name: "description", widget: "text" }
+      - { label: "音频类型", name: "type", widget: "select", options: ["引导冥想", "背景音乐", "呼吸音频"] }
+      - { label: "音频文件URL", name: "audioUrl", widget: "string", hint: "音频托管链接（B站、喜马拉雅或自托管）" }
+      - { label: "封面图片", name: "cover", widget: "image", required: false }
+      - { label: "内容/介绍", name: "body", widget: "markdown", required: false }
+
+  # 冥想视频
+  - name: "videos"
+    label: "视频"
+    label_singular: "视频"
+    folder: "content/videos"
+    create: true
+    slug: "{{slug}}"
+    extension: "html"
+    format: "html"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "分类", name: "category", widget: "select", options: ["清晨唤醒", "放松减压", "睡前冥想", "呼吸练习"] }
+      - { label: "难度", name: "level", widget: "select", options: ["入门", "初级", "中级", "进阶"] }
+      - { label: "时长", name: "duration", widget: "string", hint: "如：10分钟" }
+      - { label: "播放量", name: "views", widget: "string", hint: "如：1.2万", required: false }
+      - { label: "视频描述", name: "description", widget: "text" }
+      - { label: "视频来源", name: "source", widget: "select", options: ["B站", "YouTube", "本地"] }
+      - { label: "视频嵌入URL", name: "embedUrl", widget: "string", hint: "B站或YouTube的嵌入链接" }
+      - { label: "封面图片", name: "cover", widget: "image", required: false }
+      - { label: "内容/介绍", name: "body", widget: "markdown", required: false }

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>静心阁 - 冥想资源平台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA LIVE</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item active">首页</a>
+      <div class="nav-item nav-item-dropdown">
+        浏览内容
+        <div class="dropdown-menu">
+          <a href="lectures.html" class="dropdown-item">讲座开示</a>
+          <a href="videos.html" class="dropdown-item">视频专区</a>
+          <a href="literature.html" class="dropdown-item">经典文献文库</a>
+          <a href="activities.html" class="dropdown-item">各地活动分享</a>
+          <a href="downloads.html" class="dropdown-item">下载资料</a>
+        </div>
+      </div>
+      <a href="about.html" class="nav-item">关于本站</a>
+      <a href="admin.html" class="nav-item">后台管理</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 顶部横幅 -->
+    <div class="hero-banner">
+      <h1>宁静致远 · 觉察当下</h1>
+    </div>
+
+    <div class="container">
+      <!-- 搜索框 -->
+      <div class="search-box">
+        <input type="text" class="search-input" id="globalSearch" placeholder="搜索讲座、视频、文献...">
+        <button class="search-btn" onclick="globalSearch()">搜索</button>
+      </div>
+
+      <!-- 讲座开示 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">讲座开示</h2>
+          <a href="lectures.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="lecturesList"></div>
+      </div>
+
+      <!-- 视频专区 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">视频专区</h2>
+          <a href="videos.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="videosList"></div>
+      </div>
+
+      <!-- 经典文献 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">经典文献文库</h2>
+          <a href="literature.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="literatureList"></div>
+      </div>
+
+      <!-- 各地活动 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">各地活动分享</h2>
+          <a href="activities.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="activitiesList"></div>
+      </div>
+
+      <!-- 下载资料 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">下载资料</h2>
+          <a href="downloads.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="downloadsList"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // 首页初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPreviewSections();
+      
+      // 搜索功能
+      const searchInput = document.getElementById('globalSearch');
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          globalSearch();
+        }
+      });
+    });
+
+    // 加载各板块预览
+    function loadPreviewSections() {
+      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+      types.forEach(type => {
+        const data = getAllData(type);
+        const container = document.getElementById(type + 'List');
+        if (container) {
+          renderContentList(data.slice(0, 3), container);
+        }
+      });
+    }
+
+    // 全局搜索
+    function globalSearch() {
+      const keyword = document.getElementById('globalSearch').value.trim();
+      if (!keyword) return;
+      
+      const results = [];
+      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+      types.forEach(type => {
+        const data = searchData(type, keyword);
+        data.forEach(item => {
+          item._type = type;
+          results.push(item);
+        });
+      });
+      
+      if (results.length === 0) {
+        alert('未找到相关内容');
+        return;
+      }
+      
+      // 跳转到第一个结果
+      const typeNames = {
+        lectures: 'lectures',
+        videos: 'videos',
+        literature: 'literature',
+        activities: 'activities',
+        downloads: 'downloads'
+      };
+      goToDetail(results[0].id, results[0]._type);
+    }
+  </script>
+</body>
+</html>

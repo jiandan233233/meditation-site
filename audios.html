@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="冥想音频资源 - 舒缓的冥想音频引导，伴你进入深度放松">
+  <title>冥想音频 - 静心阁</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="#7B9E87" stroke-width="2"/>
+          <circle cx="20" cy="20" r="12" stroke="#D4A574" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="5" fill="#7B9E87"/>
+        </svg>
+        <span class="logo-text">静心阁</span>
+      </a>
+      
+      <button class="menu-toggle" aria-label="菜单">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <nav class="nav">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="videos.html" class="nav-link">视频</a>
+        <a href="audios.html" class="nav-link active">音频</a>
+        <a href="articles.html" class="nav-link">文章</a>
+        <a href="search.html" class="nav-link">搜索</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1 class="page-title">冥想音频</h1>
+      <p class="page-subtitle">舒缓的冥想音频引导，伴你进入深度放松</p>
+    </div>
+  </section>
+
+  <!-- Audio List -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">全部</button>
+        <button class="filter-tab" data-filter="morning">清晨唤醒</button>
+        <button class="filter-tab" data-filter="relaxation">放松减压</button>
+        <button class="filter-tab" data-filter="sleep">睡前冥想</button>
+        <button class="filter-tab" data-filter="breathing">呼吸练习</button>
+      </div>
+      
+      <!-- Audio List -->
+      <div class="cards-grid" style="grid-template-columns: 1fr;">
+        <div class="audio-player" data-category="morning">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">清晨5分钟正念唤醒</h4>
+              <p class="audio-duration">5:30 · 引导冥想</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        
+        <div class="audio-player" data-category="sleep">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">深度睡眠引导冥想</h4>
+              <p class="audio-duration">20:00 · 睡前放松</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        
+        <div class="audio-player" data-category="relaxation">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">紧张焦虑缓解音频</h4>
+              <p class="audio-duration">12:45 · 减压放松</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        
+        <div class="audio-player" data-category="breathing">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">4-7-8呼吸法练习</h4>
+              <p class="audio-duration">8:00 · 呼吸调节</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        
+        <div class="audio-player" data-category="morning">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">感恩晨间冥想</h4>
+              <p class="audio-duration">10:15 · 积极心态</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        
+        <div class="audio-player" data-category="relaxation">
+          <div class="audio-player-card">
+            <div class="audio-cover">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <div class="audio-info">
+              <h4 class="audio-title">身体扫描渐进式放松</h4>
+              <p class="audio-duration">18:30 · 深度放松</p>
+              <div class="audio-controls">
+                <button class="play-btn">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-progress">
+                  <div class="audio-progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <audio preload="metadata">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-text">© 2024 静心阁 · 免费冥想资源 · 愿你找到内心的宁静</p>
+      <div class="footer-links">
+        <a href="admin/index.html" class="footer-link">管理后台</a>
+        <a href="search.html" class="footer-link">搜索</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

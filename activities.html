@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>各地活动分享 - 静心阁</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA LIVE</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item">首页</a>
+      <div class="nav-item nav-item-dropdown">
+        浏览内容
+        <div class="dropdown-menu">
+          <a href="lectures.html" class="dropdown-item">讲座开示</a>
+          <a href="videos.html" class="dropdown-item">视频专区</a>
+          <a href="literature.html" class="dropdown-item">经典文献文库</a>
+          <a href="activities.html" class="dropdown-item">各地活动分享</a>
+          <a href="downloads.html" class="dropdown-item">下载资料</a>
+        </div>
+      </div>
+      <a href="about.html" class="nav-item">关于本站</a>
+      <a href="admin.html" class="nav-item">后台管理</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 板块标题横幅 -->
+    <div class="page-banner">
+      <h1>各地活动分享</h1>
+    </div>
+
+    <div class="container">
+      <!-- 说明文字 -->
+      <p class="section-desc">发现身边的冥想共修活动，与同修者一起练习成长。</p>
+
+      <!-- 搜索框 -->
+      <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索活动名称或地点...">
+        <button class="search-btn" onclick="performSearch('activities')">搜索</button>
+      </div>
+
+      <!-- 分类筛选 -->
+      <div class="filter-bar">
+        <div class="filter-tags" id="filterTags"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 暗黑模式</button>
+      </div>
+
+      <!-- 内容列表 -->
+      <div class="content-list" id="contentList"></div>
+
+      <!-- 分页 -->
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    const PAGE_SIZE = 10;
+    let currentPage = 1;
+    let filteredData = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initPage();
+    });
+
+    function initPage() {
+      const data = getAllData('activities');
+      filteredData = data;
+      
+      // 渲染分类标签
+      const categories = getCategories('activities');
+      renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
+      
+      // 渲染列表
+      renderPage(1);
+      
+      // 搜索功能
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch('activities');
+        }
+      });
+    }
+
+    function filterByCategory(category) {
+      if (!category) {
+        filteredData = getAllData('activities');
+      } else {
+        filteredData = getAllData('activities').filter(item => item.category === category);
+      }
+      renderPage(1);
+    }
+
+    function performSearch(type) {
+      const keyword = document.getElementById('searchInput').value.trim();
+      filteredData = searchData(type, keyword);
+      renderPage(1);
+    }
+
+    function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageData = filteredData.slice(start, end);
+      
+      const container = document.getElementById('contentList');
+      if (pageData.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无内容</div>';
+      } else {
+        renderContentList(pageData, container);
+      }
+      
+      renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if (current === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+  </script>
+</body>
+</html>
