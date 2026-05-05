@@ -3,158 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>详细内容 - Sahaja Yoga</title>
+  <title>内容详情 - Sahaja Yoga</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <!-- 导航栏 -->
   <nav class="navbar">
-    <a href="index.html" class="navbar-brand">SAHAJA LIVE</a>
+    <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
     <button class="menu-toggle">☰</button>
     <div class="navbar-menu">
       <a href="index.html" class="nav-item">首页</a>
-      <div class="nav-item nav-item-dropdown">
-        浏览内容
-        <div class="dropdown-menu">
-          <a href="lectures.html" class="dropdown-item">讲座开示</a>
-          <a href="videos.html" class="dropdown-item">视频专区</a>
-          <a href="literature.html" class="dropdown-item">经典文献文库</a>
-          <a href="activities.html" class="dropdown-item">各地活动分享</a>
-          <a href="downloads.html" class="dropdown-item">下载资料</a>
-        </div>
-      </div>
-      <a href="about.html" class="nav-item">关于本站</a>
-      <a href="admin.html" class="nav-item">后台管理</a>
+      <a href="lectures.html" class="nav-item">讲座开示</a>
+      <a href="videos.html" class="nav-item">视频专区</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item nav-creator">✏️ 发布</a>
     </div>
   </nav>
 
-  <!-- 主内容 -->
-  <main class="main-content">
-    <div class="container">
-      <a href="javascript:history.back()" class="back-link" style="color:var(--link-color);text-decoration:none;display:inline-block;margin-bottom:16px;">← 返回</a>
-      
-      <!-- 文章内容 -->
-      <article id="articleContent">
-        <header class="detail-header">
-          <h1 class="detail-title" id="detailTitle"></h1>
-          <div class="detail-meta">
-            <span id="detailDate"></span>
-            <span id="detailCategory"></span>
-          </div>
-        </header>
-        
-        <!-- 视频嵌入 -->
-        <div id="videoEmbed" style="display:none;margin-bottom:24px;"></div>
-        
-        <!-- 正文内容 -->
-        <div class="detail-content" id="detailContent"></div>
-        
-        <!-- 下载链接 -->
-        <div id="downloadLink" style="display:none;margin-bottom:24px;">
-          <a href="#" class="download-btn" style="display:inline-block;padding:12px 24px;background:#666;color:white;text-decoration:none;border-radius:4px;">下载资料</a>
-        </div>
-      </article>
+  <main class="detail-container">
+    <!-- 面包屑 -->
+    <div class="breadcrumb" id="breadcrumb">
+      <a href="index.html">首页</a> &gt; <span id="breadcrumb-category">加载中...</span>
+    </div>
 
-      <!-- 评论区 -->
-      <section class="comments-section">
-        <h2 class="comments-title">评论</h2>
-        
-        <!-- 评论表单 -->
-        <div class="comment-form">
-          <div class="comment-input-group">
-            <input type="text" class="comment-input comment-author-input" placeholder="昵称">
-          </div>
-          <div class="comment-input-group">
-            <textarea class="comment-input comment-textarea comment-body-input" placeholder="写下你的评论..."></textarea>
-          </div>
-          <button class="comment-submit" onclick="submitComment(currentContentId)">发表评论</button>
-        </div>
-        
+    <!-- 标题区 -->
+    <div class="detail-header">
+      <h1 class="detail-title" id="detail-title">加载中...</h1>
+      <div class="detail-meta" id="detail-meta">
+        <span class="detail-date" id="detail-date"></span>
+        <span class="detail-category" id="detail-category"></span>
+      </div>
+    </div>
+
+    <!-- 视频区 -->
+    <div class="detail-video" id="detail-video" style="display:none;">
+      <div class="video-wrapper" id="video-wrapper">
+        <!-- 视频嵌入区域 -->
+      </div>
+    </div>
+
+    <!-- 正文区 -->
+    <div class="detail-content" id="detail-content">
+      <p>加载中...</p>
+    </div>
+
+    <!-- 评论区 -->
+    <div class="comment-section">
+      <h2 class="comment-title">💬 留言区</h2>
+      <div class="comment-form">
+        <input type="text" class="comment-nickname" id="comment-nickname" placeholder="你的昵称">
+        <textarea class="comment-text" id="comment-text" placeholder="写下你的感受..." rows="3"></textarea>
+        <button class="comment-submit" id="comment-submit">留言</button>
+      </div>
+      <div class="comment-list" id="comment-list">
         <!-- 评论列表 -->
-        <div class="comment-list" id="commentList"></div>
-      </section>
+      </div>
     </div>
   </main>
 
+  <footer>
+    <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources</p>
+  </footer>
+
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
-  <script>
-    let currentContentId = '';
-    let currentContentType = '';
-
-    document.addEventListener('DOMContentLoaded', function() {
-      loadDetail();
-    });
-
-    function loadDetail() {
-      const id = getUrlParam('id');
-      const type = getUrlParam('type');
-      
-      if (!id || !type) {
-        document.getElementById('articleContent').innerHTML = '<div class="empty-state">参数错误，请从列表页进入</div>';
-        return;
-      }
-
-      currentContentId = id;
-      currentContentType = type;
-
-      const item = getItemById(type, id);
-      
-      if (!item) {
-        document.getElementById('articleContent').innerHTML = '<div class="empty-state">内容不存在</div>';
-        return;
-      }
-
-      // 渲染标题和元信息
-      document.getElementById('detailTitle').textContent = item.title;
-      document.getElementById('detailDate').textContent = item.date;
-      if (item.category) {
-        document.getElementById('detailCategory').textContent = ' · ' + item.category;
-      }
-
-      // 渲染视频
-      if (item.videoUrl) {
-        const videoContainer = document.getElementById('videoEmbed');
-        videoContainer.style.display = 'block';
-        // 支持YouTube/B站/本地视频
-        // YouTube视频请访问B站或其他平台观看
-          videoContainer.innerHTML = '<div class="video-placeholder"><p>📺 该视频请访问B站或其他平台观看</p></div>';" frameborder="0" allowfullscreen></iframe>`;
-        } else if (item.videoUrl.includes('bilibili')) {
-          const bvid = extractBilibiliId(item.videoUrl);
-          videoContainer.innerHTML = `<iframe width="100%" height="400" src="//player.bilibili.com/player.html?bvid=${bvid}" frameborder="0" allowfullscreen></iframe>`;
-        } else {
-          videoContainer.innerHTML = `<video src="${item.videoUrl}" controls style="width:100%;"></video>`;
-        }
-      }
-
-      // 渲染内容
-      document.getElementById('detailContent').innerHTML = item.content || '<p>暂无详细内容</p>';
-
-      // 渲染下载链接
-      if (item.downloadUrl) {
-        const downloadContainer = document.getElementById('downloadLink');
-        downloadContainer.style.display = 'block';
-        downloadContainer.querySelector('a').href = item.downloadUrl;
-      }
-
-      // 更新页面标题
-      document.title = item.title + ' - Sahaja Yoga';
-
-      // 渲染评论
-      renderComments(id);
-    }
-
-    function extractYouTubeId(url) {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    function extractBilibiliId(url) {
-      const regExp = /bilibili\.com\/video\/(BV[\w]+)/;
-      const match = url.match(regExp);
-      return match ? match[1] : null;
-    }
-  </script>
+  <script src="js/detail.js"></script>
 </body>
 </html>

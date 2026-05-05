@@ -114,7 +114,7 @@
       if (pageData.length === 0) {
         container.innerHTML = '<div class="empty-state">暂无内容</div>';
       } else {
-        renderContentList(pageData, container);
+        renderContentList(pageData, container, true, 'activities');
       }
       
       renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);

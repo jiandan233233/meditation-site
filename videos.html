@@ -114,10 +114,31 @@
       if (pageData.length === 0) {
         container.innerHTML = '<div class="empty-state">暂无内容</div>';
       } else {
-        renderContentList(pageData, container);
+        renderContentListWithVideo(pageData, container);
       }
       
       renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);
+    }
+
+    // 渲染视频列表（带播放图标）
+    function renderContentListWithVideo(items, container) {
+      if (!container) return;
+      
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无内容</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="content-item has-video" onclick="goToDetail('${item.id}', 'videos')">
+          <div class="item-header">
+            <span class="item-category">📺 ${item.category || '冥想'}</span>
+            <span class="item-date">${item.date}</span>
+          </div>
+          <span class="item-title">${item.title}</span>
+          ${item.summary ? `<div class="item-summary">${item.summary}</div>` : ''}
+        </div>
+      `).join('');
     }
 
     function toggleTheme() {

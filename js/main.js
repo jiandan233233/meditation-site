@@ -104,7 +104,7 @@ function formatDate(dateStr) {
 /**
  * 渲染内容列表
  */
-function renderContentList(items, container, showCategory = true) {
+function renderContentList(items, container, showCategory = true, defaultType = null) {
   if (!container) return;
   
   if (!items || items.length === 0) {
@@ -113,7 +113,7 @@ function renderContentList(items, container, showCategory = true) {
   }
 
   container.innerHTML = items.map(item => `
-    <div class="content-item" onclick="goToDetail('${item.id}', '${getUrlParam('type') || getCurrentType()}')">
+    <div class="content-item ${item.videoUrl ? 'has-video' : ''}" onclick="goToDetail('${item.id}', '${defaultType || getUrlParam('type') || getCurrentType()}')">
       ${showCategory && item.category ? `<div class="item-category">${item.category}</div>` : ''}
       <div class="item-header">
         ${showCategory && item.category ? '<span></span>' : ''}

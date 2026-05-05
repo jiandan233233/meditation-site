@@ -112,7 +112,7 @@
         const data = getAllData(type);
         const container = document.getElementById(type + 'List');
         if (container) {
-          renderContentList(data.slice(0, 3), container);
+          renderContentList(data.slice(0, 3), container, true, type);
         }
       });
     }
@@ -122,30 +122,8 @@
       const keyword = document.getElementById('globalSearch').value.trim();
       if (!keyword) return;
       
-      const results = [];
-      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
-      types.forEach(type => {
-        const data = searchData(type, keyword);
-        data.forEach(item => {
-          item._type = type;
-          results.push(item);
-        });
-      });
-      
-      if (results.length === 0) {
-        alert('未找到相关内容');
-        return;
-      }
-      
-      // 跳转到第一个结果
-      const typeNames = {
-        lectures: 'lectures',
-        videos: 'videos',
-        literature: 'literature',
-        activities: 'activities',
-        downloads: 'downloads'
-      };
-      goToDetail(results[0].id, results[0]._type);
+      // 跳转到搜索页面
+      window.location.href = 'search.html?q=' + encodeURIComponent(keyword);
     }
   </script>
 </body>

@@ -3,96 +3,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="搜索冥想资源 - 视频、音频、文章全文检索">
   <title>搜索 - Sahaja Yoga</title>
-  
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">
-        <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
-          <circle cx="20" cy="20" r="18" stroke="#7B9E87" stroke-width="2"/>
-          <circle cx="20" cy="20" r="12" stroke="#D4A574" stroke-width="1.5"/>
-          <circle cx="20" cy="20" r="5" fill="#7B9E87"/>
-        </svg>
-        <span class="logo-text">Sahaja Yoga</span>
-      </a>
-      
-      <button class="menu-toggle" aria-label="菜单">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      
-      <nav class="nav">
-        <a href="index.html" class="nav-link">首页</a>
-        <a href="videos.html" class="nav-link">视频</a>
-        <a href="audios.html" class="nav-link">音频</a>
-        <a href="articles.html" class="nav-link">文章</a>
-        <a href="search.html" class="nav-link active">搜索</a>
-      </nav>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item">首页</a>
+      <a href="lectures.html" class="nav-item">讲座开示</a>
+      <a href="videos.html" class="nav-item">视频专区</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item nav-creator">✏️ 发布</a>
     </div>
-  </header>
+  </nav>
 
-  <!-- Search Section -->
-  <section class="hero">
+  <main class="main-content">
+    <!-- 搜索横幅 -->
+    <div class="page-banner">
+      <h1>🔍 搜索</h1>
+    </div>
+
     <div class="container">
-      <h1 class="hero-title">搜索资源</h1>
-      <p class="hero-subtitle">输入关键词，找到你需要的冥想内容</p>
-      
-      <div class="search-box" style="max-width: 600px;">
-        <input type="text" id="search-input" placeholder="搜索冥想、视频、音频、文章..." autofocus>
-        <button onclick="window.performGlobalSearch(document.getElementById('search-input').value)">
-          <svg viewBox="0 0 24 24">
-            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-          </svg>
-        </button>
+      <!-- 搜索框 -->
+      <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索...">
+        <button class="search-btn" onclick="performSearch()">搜索</button>
       </div>
-    </div>
-  </section>
 
-  <!-- Search Results -->
-  <section class="search-results">
-    <div class="container">
-      <div id="search-results">
-        <!-- Results will be populated by JavaScript -->
+      <!-- 搜索结果 -->
+      <div class="search-results" id="searchResults">
+        <p class="search-hint">输入关键词开始搜索...</p>
       </div>
-    </div>
-  </section>
 
-  <!-- Quick Links -->
-  <section class="content-section">
-    <div class="container">
-      <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">热门标签</h2>
-      <div class="filter-tabs">
-        <button class="filter-tab" onclick="window.performGlobalSearch('入门')">入门</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('呼吸')">呼吸</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('睡眠')">睡眠</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('放松')">放松</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('减压')">减压</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('正念')">正念</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('清晨')">清晨</button>
-        <button class="filter-tab" onclick="window.performGlobalSearch('感恩')">感恩</button>
+      <!-- 热门标签 -->
+      <div class="hot-tags">
+        <h3 class="hot-tags-title">热门标签</h3>
+        <div class="filter-tags">
+          <span class="filter-tag" onclick="searchByTag('冥想')">冥想</span>
+          <span class="filter-tag" onclick="searchByTag('入门')">入门</span>
+          <span class="filter-tag" onclick="searchByTag('呼吸')">呼吸</span>
+          <span class="filter-tag" onclick="searchByTag('正念')">正念</span>
+          <span class="filter-tag" onclick="searchByTag('睡眠')">睡眠</span>
+          <span class="filter-tag" onclick="searchByTag('放松')">放松</span>
+          <span class="filter-tag" onclick="searchByTag('减压')">减压</span>
+          <span class="filter-tag" onclick="searchByTag('清晨')">清晨</span>
+        </div>
       </div>
     </div>
-  </section>
+  </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources</p>
-      <div class="footer-links">
-        <a href="admin/index.html" class="footer-link">管理后台</a>
-        <a href="search.html" class="footer-link">搜索</a>
-      </div>
-    </div>
+  <footer>
+    <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources</p>
   </footer>
 
-  <script src="js/fuse.min.js"></script>
+  <script src="js/data.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/search.js"></script>
+  <script>
+    // 类型名称映射
+    const TYPE_NAMES = {
+      lectures: '讲座开示',
+      videos: '视频专区',
+      literature: '经典文献',
+      activities: '活动分享',
+      downloads: '下载资料'
+    };
+
+    // 类型颜色
+    const TYPE_COLORS = {
+      lectures: '#FF8C42',
+      videos: '#4CAF50',
+      literature: '#2196F3',
+      activities: '#9C27B0',
+      downloads: '#795548'
+    };
+
+    // 页面初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get('q');
+      
+      if (query) {
+        document.getElementById('searchInput').value = query;
+        performSearch(query);
+      }
+
+      // 回车搜索
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    });
+
+    // 执行搜索
+    function performSearch(keyword) {
+      keyword = keyword || document.getElementById('searchInput').value.trim();
+      if (!keyword) {
+        document.getElementById('searchResults').innerHTML = '<p class="search-hint">请输入搜索关键词</p>';
+        return;
+      }
+
+      const results = [];
+      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+      
+      types.forEach(type => {
+        const data = getAllData(type);
+        data.forEach(item => {
+          // 匹配标题、摘要、内容、分类
+          const matchTitle = item.title && item.title.toLowerCase().includes(keyword.toLowerCase());
+          const matchSummary = item.summary && item.summary.toLowerCase().includes(keyword.toLowerCase());
+          const matchCategory = item.category && item.category.toLowerCase().includes(keyword.toLowerCase());
+          const matchContent = item.content && item.content.toLowerCase().includes(keyword.toLowerCase());
+          
+          if (matchTitle || matchSummary || matchCategory || matchContent) {
+            results.push({
+              ...item,
+              _type: type,
+              _matchType: matchTitle ? 'title' : (matchSummary ? 'summary' : (matchCategory ? 'category' : 'content'))
+            });
+          }
+        });
+      });
+
+      // 更新URL
+      window.history.replaceState({}, '', '?q=' + encodeURIComponent(keyword));
+
+      // 渲染结果
+      renderResults(results, keyword);
+    }
+
+    // 按标签搜索
+    function searchByTag(tag) {
+      document.getElementById('searchInput').value = tag;
+      performSearch(tag);
+    }
+
+    // 渲染搜索结果
+    function renderResults(results, keyword) {
+      const container = document.getElementById('searchResults');
+      
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>未找到与"${escapeHtml(keyword)}"相关的内容</p>
+            <p style="margin-top:12px;font-size:13px;">试试其他关键词，或浏览各板块内容</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `<p class="search-count">找到 ${results.length} 个相关结果</p>`;
+      html += '<div class="search-list">';
+
+      results.forEach(item => {
+        const excerpt = getExcerpt(item, keyword);
+        const typeName = TYPE_NAMES[item._type] || item._type;
+        const typeColor = TYPE_COLORS[item._type] || '#666';
+
+        html += `
+          <div class="search-item" onclick="goToDetail('${item.id}', '${item._type}')">
+            <span class="search-type" style="background:${typeColor}">${typeName}</span>
+            <h3 class="search-title">${highlightKeyword(item.title, keyword)}</h3>
+            <p class="search-excerpt">${excerpt}</p>
+            <div class="search-meta">
+              <span class="search-date">${item.date || ''}</span>
+              ${item.category ? `<span class="search-category">${item.category}</span>` : ''}
+              ${item.videoUrl ? '<span class="search-video">▶ 视频</span>' : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // 获取摘要
+    function getExcerpt(item, keyword) {
+      const text = item.summary || item.content || '';
+      // 移除HTML标签
+      const plainText = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      
+      const lowerText = plainText.toLowerCase();
+      const lowerKeyword = keyword.toLowerCase();
+      const index = lowerText.indexOf(lowerKeyword);
+      
+      if (index === -1) {
+        return plainText.substring(0, 100) + (plainText.length > 100 ? '...' : '');
+      }
+
+      const start = Math.max(0, index - 30);
+      const end = Math.min(plainText.length, index + keyword.length + 70);
+      let excerpt = plainText.substring(start, end);
+      
+      if (start > 0) excerpt = '...' + excerpt;
+      if (end < plainText.length) excerpt = excerpt + '...';
+      
+      return highlightKeyword(excerpt, keyword);
+    }
+
+    // 高亮关键词
+    function highlightKeyword(text, keyword) {
+      if (!keyword) return text;
+      const regex = new RegExp('(' + escapeRegex(keyword) + ')', 'gi');
+      return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    // 转义正则特殊字符
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // HTML转义
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 跳转到详情页
+    function goToDetail(id, type) {
+      window.location.href = `detail.html?id=${id}&type=${type}`;
+    }
+  </script>
+  <style>
+    .search-hint {
+      text-align: center;
+      color: #999;
+      padding: 40px 20px;
+    }
+    .search-count {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .search-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .search-item {
+      background: var(--bg-light);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .search-item:hover {
+      background: var(--border-color);
+    }
+    .search-type {
+      display: inline-block;
+      font-size: 11px;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+    .search-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+    .search-title mark {
+      background: #FFF3CD;
+      color: #856404;
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    .search-excerpt {
+      font-size: 14px;
+      color: var(--text-summary);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .search-excerpt mark {
+      background: #FFF3CD;
+      color: #856404;
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    .search-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: #999;
+    }
+    .search-video {
+      color: #FF8C42;
+    }
+    .hot-tags {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+    .hot-tags-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 12px;
+    }
+  </style>
 </body>
 </html>
