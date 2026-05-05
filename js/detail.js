@@ -11,8 +11,8 @@
 
   // 类型名称映射
   const TYPE_NAMES = {
-    lectures: '讲座开示',
-    videos: '视频专区',
+    lectures: '讲座',
+    videos: '视频',
     literature: '经典文献',
     activities: '活动分享',
     downloads: '下载资料'

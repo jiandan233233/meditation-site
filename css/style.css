@@ -1268,3 +1268,38 @@ body {
   font-size: 10px;
   color: #FF8C42;
 }
+
+/* 视频输入标签页 */
+.video-input-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 8px;
+}
+
+.video-tab {
+  padding: 6px 16px;
+  border: 1px solid #DDD;
+  background: #F8F8F8;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+  transition: background 0.15s;
+}
+
+.video-tab:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.video-tab:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.video-tab.active {
+  background: #FF8C42;
+  color: #FFF;
+  border-color: #FF8C42;
+}
+
+.video-input-panel {
+  margin-top: 4px;
+}

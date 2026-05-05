@@ -1,3 +1,24 @@
+
+// 处理本地视频上传
+function handleVideoUpload(callback) {
+  const fileInput = document.getElementById('videoFileInput');
+  const embedInput = document.querySelector('input[name="videoUrl"]');
+  
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    // 本地视频转base64
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      callback(e.target.result); // base64 data URL
+    };
+    reader.readAsDataURL(file);
+  } else if (embedInput && embedInput.value.trim()) {
+    callback(embedInput.value.trim());
+  } else {
+    callback('');
+  }
+}
+
 /**
  * 后台管理脚本
  */
@@ -160,8 +181,8 @@ function loadAdminList() {
 
   const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
   const typeNames = {
-    lectures: '讲座开示',
-    videos: '视频专区',
+    lectures: '讲座',
+    videos: '视频',
     literature: '经典文献',
     activities: '各地活动',
     downloads: '下载资料'

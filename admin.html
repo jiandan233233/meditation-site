@@ -16,8 +16,8 @@
       <div class="nav-item nav-item-dropdown">
         浏览内容
         <div class="dropdown-menu">
-          <a href="lectures.html" class="dropdown-item">讲座开示</a>
-          <a href="videos.html" class="dropdown-item">视频专区</a>
+          <a href="lectures.html" class="dropdown-item">讲座</a>
+          <a href="videos.html" class="dropdown-item">视频</a>
           <a href="literature.html" class="dropdown-item">经典文献文库</a>
           <a href="activities.html" class="dropdown-item">各地活动分享</a>
           <a href="downloads.html" class="dropdown-item">下载资料</a>
@@ -45,8 +45,8 @@
           <div class="form-group">
             <label class="form-label">选择板块</label>
             <select class="form-select" name="type">
-              <option value="lectures">讲座开示</option>
-              <option value="videos">视频专区</option>
+              <option value="lectures">讲座</option>
+              <option value="videos">视频</option>
               <option value="literature">经典文献</option>
               <option value="activities">各地活动</option>
               <option value="downloads">下载资料</option>
@@ -86,9 +86,23 @@
           </div>
 
           <div class="form-group" id="videoUrlGroup">
-            <label class="form-label">视频嵌入链接（可选）</label>
-            <p class="form-hint">支持B站视频链接（BV号或完整链接）、YouTube链接、或其他iframe嵌入链接</p>
-            <input type="text" class="form-input" name="videoUrl" placeholder="例如：BV1xx411c7mu 或 https://www.bilibili.com/video/BV...">
+            <label class="form-label">视频（可选）</label>
+            <div class="video-input-tabs">
+              <button type="button" class="video-tab active" onclick="switchVideoTab('embed')">B站/嵌入链接</button>
+              <button type="button" class="video-tab" onclick="switchVideoTab('upload')">上传本地视频</button>
+            </div>
+            <div id="videoEmbedInput" class="video-input-panel">
+              <p class="form-hint">支持B站视频链接（BV号或完整链接）、YouTube链接、或其他iframe嵌入链接</p>
+              <input type="text" class="form-input" name="videoUrl" placeholder="例如：BV1xx411c7mu 或 https://www.bilibili.com/video/BV...">
+            </div>
+            <div id="videoUploadInput" class="video-input-panel" style="display:none;">
+              <p class="form-hint">选择本地视频文件（MP4格式，建议50MB以内）</p>
+              <input type="file" class="form-input" name="videoFile" accept="video/mp4,video/webm,video/ogg" id="videoFileInput">
+              <div id="videoFilePreview" style="display:none;margin-top:8px;">
+                <video id="previewVideo" controls style="width:100%;max-width:400px;border-radius:4px;"></video>
+                <button type="button" onclick="clearVideoFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除视频</button>
+              </div>
+            </div>
           </div>
 
           <div class="form-group" id="downloadUrlGroup">
@@ -172,6 +186,36 @@
       videoGroup.style.display = type === 'videos' ? 'block' : 'none';
       downloadGroup.style.display = type === 'downloads' ? 'block' : 'none';
     });
+  </script>
+<script>
+    function switchVideoTab(tab) {
+      document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.video-input-panel').forEach(p => p.style.display = 'none');
+      
+      if (tab === 'embed') {
+        document.getElementById('videoEmbedInput').style.display = 'block';
+        document.querySelector('.video-tab:first-child').classList.add('active');
+      } else {
+        document.getElementById('videoUploadInput').style.display = 'block';
+        document.querySelector('.video-tab:last-child').classList.add('active');
+      }
+    }
+
+    // 本地视频预览
+    document.getElementById('videoFileInput')?.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        document.getElementById('previewVideo').src = url;
+        document.getElementById('videoFilePreview').style.display = 'block';
+      }
+    });
+
+    function clearVideoFile() {
+      document.getElementById('videoFileInput').value = '';
+      document.getElementById('videoFilePreview').style.display = 'none';
+      document.getElementById('previewVideo').src = '';
+    }
   </script>
 </body>
 </html>
