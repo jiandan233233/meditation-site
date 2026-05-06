@@ -3,359 +3,1174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>后台管理 - Sahaja Yoga</title>
+  <title>创作者工作台 - Sahaja Yoga</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ========== 创作者工作台专用样式 ========== */
+    
+    /* CSS变量扩展 */
+    :root {
+      --creator-primary: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+      --creator-primary-solid: #FF8C42;
+      --creator-secondary: #FFF3E0;
+      --creator-shadow: 0 4px 20px rgba(255, 140, 66, 0.2);
+      --creator-shadow-hover: 0 6px 24px rgba(255, 140, 66, 0.3);
+      --sidebar-width: 60px;
+    }
+
+    [data-theme="dark"] {
+      --creator-secondary: #3D2800;
+      --creator-shadow: 0 4px 20px rgba(255, 140, 66, 0.15);
+      --creator-shadow-hover: 0 6px 24px rgba(255, 140, 66, 0.25);
+    }
+
+    /* 创作者工作台主容器 */
+    .creator-workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      padding-left: calc(var(--sidebar-width) + 40px);
+      min-height: 100vh;
+    }
+
+    /* 顶部快捷入口区 */
+    .quick-access-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--creator-primary);
+      border-radius: 2px;
+    }
+
+    .quick-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .quick-card {
+      background: var(--bg-color);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quick-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--creator-primary);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .quick-card:hover {
+      border-color: var(--creator-primary-solid);
+      box-shadow: var(--creator-shadow);
+      transform: translateY(-4px);
+    }
+
+    .quick-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .quick-card.active {
+      border-color: var(--creator-primary-solid);
+      background: var(--creator-secondary);
+    }
+
+    .quick-card.active::before {
+      transform: scaleX(1);
+    }
+
+    .quick-card-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .quick-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+
+    .quick-card-count {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* 发布表单区域 */
+    .publish-section {
+      background: var(--bg-color);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .publish-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .publish-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .publish-title-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--creator-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+    }
+
+    .quick-tag-select {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .quick-tag {
+      padding: 8px 16px;
+      background: var(--bg-light);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-tag:hover {
+      border-color: var(--creator-primary-solid);
+      color: var(--creator-primary-solid);
+    }
+
+    .quick-tag.selected {
+      background: var(--creator-primary);
+      border-color: var(--creator-primary-solid);
+      color: white;
+    }
+
+    /* 表单样式 */
+    .creator-form {
+      max-width: 800px;
+    }
+
+    .form-group-main {
+      margin-bottom: 24px;
+    }
+
+    .form-label-main {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .form-input-main {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.2s;
+    }
+
+    .form-input-main:focus {
+      outline: none;
+      border-color: var(--creator-primary-solid);
+      box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.1);
+    }
+
+    .form-input-main::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-textarea-main {
+      min-height: 200px;
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.7;
+    }
+
+    /* 媒体上传区域 */
+    .media-upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
+      padding: 40px 24px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: var(--bg-light);
+    }
+
+    .media-upload-area:hover,
+    .media-upload-area.dragover {
+      border-color: var(--creator-primary-solid);
+      background: var(--creator-secondary);
+    }
+
+    .media-upload-area.dragover {
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    .upload-text {
+      font-size: 15px;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+
+    .upload-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .upload-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .upload-tab {
+      padding: 10px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .upload-tab:hover {
+      border-color: var(--creator-primary-solid);
+    }
+
+    .upload-tab.active {
+      background: var(--creator-primary);
+      border-color: var(--creator-primary-solid);
+      color: white;
+    }
+
+    .upload-panel {
+      display: none;
+    }
+
+    .upload-panel.active {
+      display: block;
+    }
+
+    /* 图片预览网格 */
+    .image-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .image-preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-preview-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 提交按钮区域 */
+    .form-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-publish {
+      padding: 16px 40px;
+      background: var(--creator-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-publish:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--creator-shadow-hover);
+    }
+
+    .btn-preview {
+      padding: 16px 28px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-preview:hover {
+      border-color: var(--creator-primary-solid);
+      color: var(--creator-primary-solid);
+    }
+
+    /* 内容管理区域 */
+    .manage-section {
+      background: var(--bg-color);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .manage-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .manage-tab {
+      padding: 10px 20px;
+      border: none;
+      background: var(--bg-light);
+      color: var(--text-color);
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .manage-tab:hover {
+      background: var(--border-color);
+    }
+
+    .manage-tab.active {
+      background: var(--creator-primary);
+      color: white;
+    }
+
+    .manage-tab-count {
+      background: rgba(255,255,255,0.3);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .manage-tab:not(.active) .manage-tab-count {
+      background: var(--border-color);
+    }
+
+    /* 内容列表 */
+    .manage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .manage-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg-light);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .manage-item:hover {
+      background: var(--border-color);
+    }
+
+    .manage-item-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--creator-secondary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .manage-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .manage-item-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .manage-item-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .manage-item-type {
+      display: inline-block;
+      padding: 2px 10px;
+      background: var(--creator-secondary);
+      color: var(--creator-primary-solid);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .manage-item-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-item-edit,
+    .btn-item-delete {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-item-edit {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    .btn-item-edit:hover {
+      border-color: var(--creator-primary-solid);
+      color: var(--creator-primary-solid);
+    }
+
+    .btn-item-delete {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: #dc3545;
+    }
+
+    .btn-item-delete:hover {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    /* 侧边栏 */
+    .sidebar-toolbar {
+      position: fixed;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .sidebar-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .sidebar-btn:hover {
+      background: var(--creator-primary);
+      border-color: var(--creator-primary-solid);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .sidebar-btn-tooltip {
+      position: absolute;
+      left: 56px;
+      background: var(--text-color);
+      color: var(--bg-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .sidebar-btn:hover .sidebar-btn-tooltip {
+      opacity: 1;
+    }
+
+    /* 快速发布展开菜单 */
+    .quick-publish-dropdown {
+      position: absolute;
+      left: 56px;
+      top: 0;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: var(--creator-shadow);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-10px);
+      transition: all 0.2s;
+      min-width: 160px;
+    }
+
+    .sidebar-btn:hover .quick-publish-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .quick-publish-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .quick-publish-item:hover {
+      background: var(--creator-secondary);
+    }
+
+    /* 空状态 */
+    .empty-state-creator {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-hint {
+      font-size: 14px;
+    }
+
+    /* 编辑弹窗 */
+    .edit-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .edit-modal.show {
+      display: flex;
+    }
+
+    .edit-modal-content {
+      background: var(--bg-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+    }
+
+    .edit-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .edit-modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .edit-modal-close {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-light);
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      transition: all 0.2s;
+    }
+
+    .edit-modal-close:hover {
+      background: #dc3545;
+      color: white;
+    }
+
+    /* 预览弹窗 */
+    .preview-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .preview-modal.show {
+      display: flex;
+    }
+
+    .preview-modal-content {
+      background: var(--bg-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 40px;
+    }
+
+    .preview-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .preview-modal-type {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--creator-primary);
+      color: white;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .preview-modal-title {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 20px 0 12px;
+    }
+
+    .preview-modal-meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .preview-modal-body {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-color);
+    }
+
+    /* 隐藏默认导航在创作者页面 */
+    .creator-workspace ~ .navbar,
+    .creator-workspace ~ .main-content {
+      display: none;
+    }
+
+    /* 响应式 */
+    @media (max-width: 1024px) {
+      .sidebar-toolbar {
+        display: none;
+      }
+
+      .creator-workspace {
+        padding-left: 24px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .creator-workspace {
+        padding: 16px;
+      }
+
+      .quick-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .quick-card {
+        padding: 16px 12px;
+      }
+
+      .quick-card-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+      }
+
+      .quick-card-title {
+        font-size: 14px;
+      }
+
+      .publish-section,
+      .manage-section {
+        padding: 20px;
+        border-radius: 12px;
+      }
+
+      .publish-title {
+        font-size: 18px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn-publish,
+      .btn-preview {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .manage-item {
+        flex-wrap: wrap;
+      }
+
+      .manage-item-actions {
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      .btn-item-edit,
+      .btn-item-delete {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .quick-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- 导航栏 -->
-  <nav class="navbar">
-    <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
-    <button class="menu-toggle">☰</button>
-    <div class="navbar-menu">
-      <a href="index.html" class="nav-item">首页</a>
-      <a href="lectures.html" class="nav-item">讲座</a>
-      <a href="videos.html" class="nav-item">视频</a>
-      <a href="audios.html" class="nav-item">音频</a>
-      <a href="images.html" class="nav-item">图片</a>
-      <a href="literature.html" class="nav-item">经典文献</a>
-      <a href="activities.html" class="nav-item">活动分享</a>
-      <a href="downloads.html" class="nav-item">下载资料</a>
-      <a href="about.html" class="nav-item">关于</a>
-      <a href="admin.html" class="nav-item active">✏️ 发布</a>
-    </div>
-  </nav>
-
-  <!-- 主内容 -->
-  <main class="main-content">
-    <div class="container">
-      <h1 style="font-size:20px;font-weight:500;margin-bottom:24px;">✏️ 发布内容</h1>
-
-      <!-- Tab切换 -->
-      <div class="admin-tabs">
-        <button class="admin-tab active" data-tab="publishPanel">发布内容</button>
-        <button class="admin-tab" data-tab="managePanel">内容管理</button>
-      </div>
-
-      <!-- 发布内容面板 -->
-      <div class="admin-panel active" id="publishPanel">
-        <form id="publishForm">
-          <div class="form-group">
-            <label class="form-label">选择板块</label>
-            <select class="form-select" name="type">
-              <option value="lectures">讲座</option>
-              <option value="videos">视频</option>
-              <option value="audios">音频</option>
-              <option value="images">图片</option>
-              <option value="literature">经典文献</option>
-              <option value="activities">活动分享</option>
-              <option value="downloads">下载资料</option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">标题</label>
-              <input type="text" class="form-input" name="title" required placeholder="输入文章标题">
-            </div>
-            <div class="form-group">
-              <label class="form-label">发布日期</label>
-              <input type="date" class="form-input" name="date">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">分类标签</label>
-            <input type="text" class="form-input" name="category" placeholder="如：冥想入门、进阶教程等">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">简短摘要</label>
-            <textarea class="form-textarea" name="summary" placeholder="简要描述内容，控制在50字以内" style="min-height:60px;"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">详细内容（支持粘贴图片）</label>
-            <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">在下方文本框中可以直接粘贴图片（Ctrl+V / Cmd+V）</p>
-            <textarea class="form-textarea" name="content" required placeholder="输入正文内容，支持HTML格式"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">封面图片（可选）</label>
-            <input type="file" class="form-input" id="coverImage" accept="image/*">
-          </div>
-
-          <!-- 视频上传区域 -->
-          <div class="form-group" id="videoUrlGroup" style="display:none;">
-            <label class="form-label">视频（仅视频板块）</label>
-            <div class="video-input-tabs">
-              <button type="button" class="video-tab active" onclick="switchVideoTab('embed')">B站/嵌入链接</button>
-              <button type="button" class="video-tab" onclick="switchVideoTab('upload')">上传本地视频</button>
-            </div>
-            <div id="videoEmbedInput" class="video-input-panel">
-              <p class="form-hint">支持B站视频链接（BV号或完整链接）、YouTube链接、或其他iframe嵌入链接</p>
-              <input type="text" class="form-input" name="videoUrl" placeholder="例如：BV1xx411c7mu 或 https://www.bilibili.com/video/BV...">
-            </div>
-            <div id="videoUploadInput" class="video-input-panel" style="display:none;">
-              <p class="form-hint">选择本地视频文件（MP4格式，建议50MB以内）</p>
-              <input type="file" class="form-input" name="videoFile" accept="video/mp4,video/webm,video/ogg" id="videoFileInput">
-              <div id="videoFilePreview" style="display:none;margin-top:8px;">
-                <video id="previewVideo" controls style="width:100%;max-width:400px;border-radius:4px;"></video>
-                <button type="button" onclick="clearVideoFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除视频</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 音频上传区域 -->
-          <div class="form-group" id="audioUrlGroup" style="display:none;">
-            <label class="form-label">音频（仅音频板块）</label>
-            <div class="video-input-tabs">
-              <button type="button" class="video-tab active" onclick="switchAudioTab('embed')">音频链接</button>
-              <button type="button" class="video-tab" onclick="switchAudioTab('upload')">上传本地音频</button>
-            </div>
-            <div id="audioEmbedInput" class="video-input-panel">
-              <p class="form-hint">支持音频链接（MP3、WAV等格式URL）</p>
-              <input type="text" class="form-input" name="audioUrl" placeholder="输入音频文件URL">
-            </div>
-            <div id="audioUploadInput" class="video-input-panel" style="display:none;">
-              <p class="form-hint">选择本地音频文件（MP3格式，建议20MB以内）</p>
-              <input type="file" class="form-input" name="audioFile" accept="audio/mpeg,audio/wav,audio/ogg,audio/*" id="audioFileInput">
-              <div id="audioFilePreview" style="display:none;margin-top:8px;">
-                <audio id="previewAudio" controls style="width:100%;max-width:400px;"></audio>
-                <button type="button" onclick="clearAudioFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除音频</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 图片上传区域 -->
-          <div class="form-group" id="imageUrlGroup" style="display:none;">
-            <label class="form-label">图片（仅图片板块）</label>
-            <div class="video-input-tabs">
-              <button type="button" class="video-tab active" onclick="switchImageTab('embed')">图片链接</button>
-              <button type="button" class="video-tab" onclick="switchImageTab('upload')">上传本地图片</button>
-            </div>
-            <div id="imageEmbedInput" class="video-input-panel">
-              <p class="form-hint">输入图片URL</p>
-              <input type="text" class="form-input" name="imageUrl" placeholder="输入图片URL">
-            </div>
-            <div id="imageUploadInput" class="video-input-panel" style="display:none;">
-              <p class="form-hint">选择本地图片文件（建议小于5MB）</p>
-              <input type="file" class="form-input" name="imageFile" accept="image/*" id="imageFileInput">
-              <div id="imageFilePreview" style="display:none;margin-top:8px;">
-                <img id="previewImage" style="max-width:100%;max-height:300px;border-radius:4px;">
-                <button type="button" onclick="clearImageFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除图片</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 下载链接区域 -->
-          <div class="form-group" id="downloadUrlGroup" style="display:none;">
-            <label class="form-label">下载链接（仅下载区填写）</label>
-            <input type="text" class="form-input" name="downloadUrl" placeholder="文件下载链接">
-          </div>
-
-          <button type="submit" class="submit-btn">发布内容</button>
-        </form>
-      </div>
-
-      <!-- 内容管理面板 -->
-      <div class="admin-panel" id="managePanel">
-        <div class="admin-list"></div>
+  <!-- 侧边栏快捷导航（桌面端） -->
+  <div class="sidebar-toolbar">
+    <a href="index.html" class="sidebar-btn" title="回首页">
+      🏠
+      <span class="sidebar-btn-tooltip">回首页</span>
+    </a>
+    <div class="sidebar-btn" onclick="scrollToPublish()">
+      ➕
+      <span class="sidebar-btn-tooltip">快速发布</span>
+      <div class="quick-publish-dropdown">
+        <div class="quick-publish-item" onclick="selectType('lectures')">📖 讲座</div>
+        <div class="quick-publish-item" onclick="selectType('videos')">🎬 视频</div>
+        <div class="quick-publish-item" onclick="selectType('audios')">🎵 音频</div>
+        <div class="quick-publish-item" onclick="selectType('images')">🖼️ 图片</div>
+        <div class="quick-publish-item" onclick="selectType('literature')">📚 经典文献</div>
+        <div class="quick-publish-item" onclick="selectType('activities')">🎯 活动</div>
+        <div class="quick-publish-item" onclick="selectType('downloads')">📥 下载资料</div>
       </div>
     </div>
-  </main>
+    <div class="sidebar-btn" onclick="scrollToManage()">
+      📋
+      <span class="sidebar-btn-tooltip">内容管理</span>
+    </div>
+    <div class="sidebar-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      🔝
+      <span class="sidebar-btn-tooltip">返回顶部</span>
+    </div>
+  </div>
+
+  <!-- 创作者工作台主内容 -->
+  <div class="creator-workspace">
+    <!-- 顶部快捷入口区 -->
+    <section class="quick-access-section" id="quickAccess">
+      <h2 class="section-title">🎯 快速发布</h2>
+      <div class="quick-cards">
+        <div class="quick-card" data-type="lectures" onclick="selectType('lectures')">
+          <span class="quick-card-icon">📖</span>
+          <div class="quick-card-title">讲座</div>
+          <div class="quick-card-count" id="count-lectures">0 篇</div>
+        </div>
+        <div class="quick-card" data-type="videos" onclick="selectType('videos')">
+          <span class="quick-card-icon">🎬</span>
+          <div class="quick-card-title">视频</div>
+          <div class="quick-card-count" id="count-videos">0 部</div>
+        </div>
+        <div class="quick-card" data-type="audios" onclick="selectType('audios')">
+          <span class="quick-card-icon">🎵</span>
+          <div class="quick-card-title">音频</div>
+          <div class="quick-card-count" id="count-audios">0 条</div>
+        </div>
+        <div class="quick-card" data-type="images" onclick="selectType('images')">
+          <span class="quick-card-icon">🖼️</span>
+          <div class="quick-card-title">图片</div>
+          <div class="quick-card-count" id="count-images">0 张</div>
+        </div>
+        <div class="quick-card" data-type="literature" onclick="selectType('literature')">
+          <span class="quick-card-icon">📚</span>
+          <div class="quick-card-title">经典文献</div>
+          <div class="quick-card-count" id="count-literature">0 篇</div>
+        </div>
+        <div class="quick-card" data-type="activities" onclick="selectType('activities')">
+          <span class="quick-card-icon">🎯</span>
+          <div class="quick-card-title">活动</div>
+          <div class="quick-card-count" id="count-activities">0 场</div>
+        </div>
+        <div class="quick-card" data-type="downloads" onclick="selectType('downloads')">
+          <span class="quick-card-icon">📥</span>
+          <div class="quick-card-title">下载资料</div>
+          <div class="quick-card-count" id="count-downloads">0 份</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 发布表单区域 -->
+    <section class="publish-section" id="publishSection">
+      <div class="publish-header">
+        <div class="publish-title">
+          <div class="publish-title-icon" id="currentTypeIcon">📖</div>
+          <span id="currentTypeName">发布讲座</span>
+        </div>
+      </div>
+
+      <form class="creator-form" id="publishForm">
+        <!-- 标题 -->
+        <div class="form-group-main">
+          <label class="form-label-main">标题 *</label>
+          <input type="text" class="form-input-main" name="title" id="inputTitle" required placeholder="输入内容标题">
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="form-group-main">
+          <label class="form-label-main">分类标签</label>
+          <div class="quick-tag-select" id="tagSelect">
+            <span class="quick-tag" data-tag="冥想入门">冥想入门</span>
+            <span class="quick-tag" data-tag="进阶教程">进阶教程</span>
+            <span class="quick-tag" data-tag="生活实践">生活实践</span>
+            <span class="quick-tag" data-tag="经典解读">经典解读</span>
+            <span class="quick-tag" data-tag="学术研究">学术研究</span>
+          </div>
+          <input type="text" class="form-input-main" name="category" id="inputCategory" placeholder="或输入自定义标签">
+        </div>
+
+        <!-- 内容正文 -->
+        <div class="form-group-main">
+          <label class="form-label-main">内容正文 *</label>
+          <p class="upload-hint" style="margin-bottom:10px;">支持直接粘贴文字和图片（Ctrl+V / Cmd+V粘贴图片）</p>
+          <textarea class="form-input-main form-textarea-main" name="content" id="inputContent" required placeholder="输入正文内容，支持HTML格式..."></textarea>
+        </div>
+
+        <!-- 视频上传（仅视频板块） -->
+        <div class="form-group-main" id="videoGroup" style="display:none;">
+          <label class="form-label-main">视频</label>
+          <div class="upload-tabs">
+            <button type="button" class="upload-tab active" data-tab="videoEmbed">B站/嵌入链接</button>
+            <button type="button" class="upload-tab" data-tab="videoUpload">上传本地视频</button>
+          </div>
+          <div class="upload-panel active" id="videoEmbed">
+            <input type="text" class="form-input-main" name="videoUrl" id="inputVideoUrl" placeholder="输入B站链接（如：BV1xx411c7mu）或iframe嵌入代码">
+          </div>
+          <div class="upload-panel" id="videoUpload">
+            <div class="media-upload-area" id="videoDropZone">
+              <div class="upload-icon">🎬</div>
+              <div class="upload-text">拖拽视频文件到这里，或点击选择文件</div>
+              <div class="upload-hint">支持 MP4、WebM 格式，建议小于 100MB</div>
+              <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/ogg" style="display:none;">
+            </div>
+            <div id="videoPreview" style="display:none;margin-top:16px;">
+              <video id="previewVideoPlayer" controls style="width:100%;border-radius:12px;max-height:400px;"></video>
+              <button type="button" onclick="clearVideoFile()" style="margin-top:12px;padding:10px 20px;background:#dc3545;color:white;border:none;border-radius:8px;cursor:pointer;">✕ 移除视频</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 音频上传（仅音频板块） -->
+        <div class="form-group-main" id="audioGroup" style="display:none;">
+          <label class="form-label-main">音频</label>
+          <div class="upload-tabs">
+            <button type="button" class="upload-tab active" data-tab="audioEmbed">音频链接</button>
+            <button type="button" class="upload-tab" data-tab="audioUpload">上传本地音频</button>
+          </div>
+          <div class="upload-panel active" id="audioEmbed">
+            <input type="text" class="form-input-main" name="audioUrl" id="inputAudioUrl" placeholder="输入音频文件URL（MP3、WAV等）">
+          </div>
+          <div class="upload-panel" id="audioUpload">
+            <div class="media-upload-area" id="audioDropZone">
+              <div class="upload-icon">🎵</div>
+              <div class="upload-text">拖拽音频文件到这里，或点击选择文件</div>
+              <div class="upload-hint">支持 MP3、WAV、OGG 格式，建议小于 50MB</div>
+              <input type="file" id="audioFileInput" accept="audio/mpeg,audio/wav,audio/ogg,audio/*" style="display:none;">
+            </div>
+            <div id="audioPreview" style="display:none;margin-top:16px;">
+              <audio id="previewAudioPlayer" controls style="width:100%;"></audio>
+              <button type="button" onclick="clearAudioFile()" style="margin-top:12px;padding:10px 20px;background:#dc3545;color:white;border:none;border-radius:8px;cursor:pointer;">✕ 移除音频</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 图片上传（仅图片板块） -->
+        <div class="form-group-main" id="imageGroup" style="display:none;">
+          <label class="form-label-main">图片</label>
+          <div class="upload-tabs">
+            <button type="button" class="upload-tab active" data-tab="imageEmbed">图片链接</button>
+            <button type="button" class="upload-tab" data-tab="imageUpload">上传本地图片</button>
+          </div>
+          <div class="upload-panel active" id="imageEmbed">
+            <input type="text" class="form-input-main" name="imageUrl" id="inputImageUrl" placeholder="输入图片URL">
+          </div>
+          <div class="upload-panel" id="imageUpload">
+            <div class="media-upload-area" id="imageDropZone">
+              <div class="upload-icon">🖼️</div>
+              <div class="upload-text">拖拽图片到这里，或点击选择文件（支持多选）</div>
+              <div class="upload-hint">支持 JPG、PNG、GIF 格式，建议小于 10MB</div>
+              <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none;">
+            </div>
+            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+          </div>
+        </div>
+
+        <!-- 下载链接（仅下载区） -->
+        <div class="form-group-main" id="downloadGroup" style="display:none;">
+          <label class="form-label-main">下载链接</label>
+          <input type="text" class="form-input-main" name="downloadUrl" id="inputDownloadUrl" placeholder="输入文件下载链接">
+        </div>
+
+        <!-- 简短摘要 -->
+        <div class="form-group-main">
+          <label class="form-label-main">简短摘要</label>
+          <input type="text" class="form-input-main" name="summary" id="inputSummary" placeholder="简要描述内容，控制在50字以内（可选）">
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="form-actions">
+          <button type="submit" class="btn-publish">
+            <span>🚀</span> 发布内容
+          </button>
+          <button type="button" class="btn-preview" onclick="previewContent()">
+            👁️ 预览效果
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 已发布内容管理区 -->
+    <section class="manage-section" id="manageSection">
+      <h2 class="section-title">📋 内容管理</h2>
+      <div class="manage-tabs" id="manageTabs">
+        <button class="manage-tab active" data-type="all">
+          全部 <span class="manage-tab-count" id="count-all">0</span>
+        </button>
+        <button class="manage-tab" data-type="lectures">
+          📖 讲座 <span class="manage-tab-count" id="tab-count-lectures">0</span>
+        </button>
+        <button class="manage-tab" data-type="videos">
+          🎬 视频 <span class="manage-tab-count" id="tab-count-videos">0</span>
+        </button>
+        <button class="manage-tab" data-type="audios">
+          🎵 音频 <span class="manage-tab-count" id="tab-count-audios">0</span>
+        </button>
+        <button class="manage-tab" data-type="images">
+          🖼️ 图片 <span class="manage-tab-count" id="tab-count-images">0</span>
+        </button>
+        <button class="manage-tab" data-type="literature">
+          📚 文献 <span class="manage-tab-count" id="tab-count-literature">0</span>
+        </button>
+        <button class="manage-tab" data-type="activities">
+          🎯 活动 <span class="manage-tab-count" id="tab-count-activities">0</span>
+        </button>
+        <button class="manage-tab" data-type="downloads">
+          📥 下载 <span class="manage-tab-count" id="tab-count-downloads">0</span>
+        </button>
+      </div>
+      <div class="manage-list" id="manageList">
+        <!-- 动态生成内容列表 -->
+      </div>
+    </section>
+  </div>
 
   <!-- 编辑弹窗 -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">编辑内容</h2>
-        <button class="modal-close">&times;</button>
+  <div class="edit-modal" id="editModal">
+    <div class="edit-modal-content">
+      <div class="edit-modal-header">
+        <h3 class="edit-modal-title">✏️ 编辑内容</h3>
+        <button class="edit-modal-close" onclick="closeEditModal()">×</button>
       </div>
       <form id="editForm">
-        <input type="hidden" name="id">
-        <input type="hidden" name="type">
+        <input type="hidden" name="id" id="editId">
+        <input type="hidden" name="type" id="editType">
         
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">标题</label>
-            <input type="text" class="form-input" name="title" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">发布日期</label>
-            <input type="date" class="form-input" name="date">
-          </div>
+        <div class="form-group-main">
+          <label class="form-label-main">标题 *</label>
+          <input type="text" class="form-input-main" name="title" id="editTitle" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">分类标签</label>
-          <input type="text" class="form-input" name="category">
+        <div class="form-group-main">
+          <label class="form-label-main">分类标签</label>
+          <input type="text" class="form-input-main" name="category" id="editCategory">
         </div>
 
-        <div class="form-group">
-          <label class="form-label">简短摘要</label>
-          <textarea class="form-textarea" name="summary" style="min-height:60px;"></textarea>
+        <div class="form-group-main">
+          <label class="form-label-main">内容正文 *</label>
+          <textarea class="form-input-main form-textarea-main" name="content" id="editContent" required></textarea>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">详细内容</label>
-          <textarea class="form-textarea" name="content" required></textarea>
+        <div class="form-group-main">
+          <label class="form-label-main">简短摘要</label>
+          <input type="text" class="form-input-main" name="summary" id="editSummary">
         </div>
 
-        <div class="form-group">
-          <label class="form-label">视频链接</label>
-          <input type="text" class="form-input" name="videoUrl">
+        <div class="form-group-main">
+          <label class="form-label-main">发布日期</label>
+          <input type="date" class="form-input-main" name="date" id="editDate">
         </div>
 
-        <div class="form-group">
-          <label class="form-label">音频链接</label>
-          <input type="text" class="form-input" name="audioUrl">
+        <div class="form-actions">
+          <button type="submit" class="btn-publish">💾 保存修改</button>
+          <button type="button" class="btn-preview" onclick="closeEditModal()">取消</button>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">图片链接</label>
-          <input type="text" class="form-input" name="imageUrl">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">下载链接</label>
-          <input type="text" class="form-input" name="downloadUrl">
-        </div>
-
-        <button type="submit" class="submit-btn">保存修改</button>
       </form>
+    </div>
+  </div>
+
+  <!-- 预览弹窗 -->
+  <div class="preview-modal" id="previewModal">
+    <div class="preview-modal-content">
+      <div class="preview-modal-header">
+        <span class="preview-modal-type" id="previewType">讲座</span>
+        <button onclick="closePreviewModal()" style="background:none;border:none;font-size:28px;cursor:pointer;color:var(--text-color);">×</button>
+      </div>
+      <h1 class="preview-modal-title" id="previewTitle"></h1>
+      <div class="preview-modal-meta" id="previewMeta"></div>
+      <div class="preview-modal-body" id="previewBody"></div>
     </div>
   </div>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
-  <script>
-    // 根据选择的板块显示/隐藏特定字段
-    function updateFormFields() {
-      const type = document.querySelector('select[name="type"]').value;
-      const videoGroup = document.getElementById('videoUrlGroup');
-      const audioGroup = document.getElementById('audioUrlGroup');
-      const imageGroup = document.getElementById('imageUrlGroup');
-      const downloadGroup = document.getElementById('downloadUrlGroup');
-      
-      videoGroup.style.display = type === 'videos' ? 'block' : 'none';
-      audioGroup.style.display = type === 'audios' ? 'block' : 'none';
-      imageGroup.style.display = type === 'images' ? 'block' : 'none';
-      downloadGroup.style.display = type === 'downloads' ? 'block' : 'none';
-    }
-
-    document.querySelector('select[name="type"]').addEventListener('change', updateFormFields);
-
-    // 从URL参数获取板块类型
-    const urlParams = new URLSearchParams(window.location.search);
-    const preType = urlParams.get('type');
-    if (preType) {
-      const select = document.querySelector('select[name="type"]');
-      if (select) {
-        select.value = preType;
-        updateFormFields();
-      }
-    }
-
-    // 视频Tab切换
-    function switchVideoTab(tab) {
-      document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.video-input-panel').forEach(p => p.style.display = 'none');
-      
-      if (tab === 'embed') {
-        document.getElementById('videoEmbedInput').style.display = 'block';
-        document.querySelector('.video-tab:first-child').classList.add('active');
-      } else {
-        document.getElementById('videoUploadInput').style.display = 'block';
-        document.querySelector('.video-tab:last-child').classList.add('active');
-      }
-    }
-
-    // 本地视频预览
-    document.getElementById('videoFileInput')?.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        document.getElementById('previewVideo').src = url;
-        document.getElementById('videoFilePreview').style.display = 'block';
-      }
-    });
-
-    function clearVideoFile() {
-      document.getElementById('videoFileInput').value = '';
-      document.getElementById('videoFilePreview').style.display = 'none';
-      document.getElementById('previewVideo').src = '';
-    }
-
-    // 音频Tab切换
-    function switchAudioTab(tab) {
-      document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.video-input-panel').forEach(p => p.style.display = 'none'));
-      
-      const audioTabs = document.querySelectorAll('#audioUrlGroup .video-tab');
-      const audioPanels = document.querySelectorAll('#audioUrlGroup .video-input-panel');
-      audioTabs.forEach(t => t.classList.remove('active'));
-      audioPanels.forEach(p => p.style.display = 'none');
-      
-      if (tab === 'embed') {
-        document.getElementById('audioEmbedInput').style.display = 'block';
-        audioTabs[0].classList.add('active');
-      } else {
-        document.getElementById('audioUploadInput').style.display = 'block';
-        audioTabs[1].classList.add('active');
-      }
-    }
-
-    // 本地音频预览
-    document.getElementById('audioFileInput')?.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        document.getElementById('previewAudio').src = url;
-        document.getElementById('audioFilePreview').style.display = 'block';
-      }
-    });
-
-    function clearAudioFile() {
-      document.getElementById('audioFileInput').value = '';
-      document.getElementById('audioFilePreview').style.display = 'none';
-      document.getElementById('previewAudio').src = '';
-    }
-
-    // 图片Tab切换
-    function switchImageTab(tab) {
-      const imageTabs = document.querySelectorAll('#imageUrlGroup .video-tab');
-      const imagePanels = document.querySelectorAll('#imageUrlGroup .video-input-panel');
-      imageTabs.forEach(t => t.classList.remove('active'));
-      imagePanels.forEach(p => p.style.display = 'none');
-      
-      if (tab === 'embed') {
-        document.getElementById('imageEmbedInput').style.display = 'block';
-        imageTabs[0].classList.add('active');
-      } else {
-        document.getElementById('imageUploadInput').style.display = 'block';
-        imageTabs[1].classList.add('active');
-      }
-    }
-
-    // 本地图片预览
-    document.getElementById('imageFileInput')?.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          document.getElementById('previewImage').src = ev.target.result;
-          document.getElementById('imageFilePreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    function clearImageFile() {
-      document.getElementById('imageFileInput').value = '';
-      document.getElementById('imageFilePreview').style.display = 'none';
-      document.getElementById('previewImage').src = '';
-    }
-  </script>
 </body>
 </html>
