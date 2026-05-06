@@ -6,6 +6,114 @@
   <title>创作者工作台 - Sahaja Yoga</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* ========== 密码门禁样式 ========== */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-color);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .password-overlay.hidden {
+      display: none;
+    }
+
+    .password-box {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+
+    .password-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .password-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+
+    .password-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 18px;
+      text-align: center;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--creator-primary-solid);
+      box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.1);
+    }
+
+    .password-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--creator-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 12px;
+    }
+
+    .password-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--creator-shadow-hover);
+    }
+
+    .password-error {
+      color: #dc3545;
+      font-size: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .password-error.show {
+      display: block;
+    }
+
+    .password-back {
+      color: var(--text-muted);
+      font-size: 14px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .password-back:hover {
+      color: var(--text-color);
+    }
+
     /* ========== 创作者工作台专用样式 ========== */
     
     /* CSS变量扩展 */
@@ -23,6 +131,130 @@
       --creator-shadow: 0 4px 20px rgba(255, 140, 66, 0.15);
       --creator-shadow-hover: 0 6px 24px rgba(255, 140, 66, 0.25);
     }
+
+    /* 创作者提示条 */
+    .creator-bar {
+      background: #FFF3E0;
+      color: #E65100;
+      padding: 10px 16px;
+      font-size: 13px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .creator-bar a {
+      color: #E65100;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .creator-bar a:hover {
+      text-decoration: underline;
+    }
+
+    [data-theme="dark"] .creator-bar {
+      background: #3D2800;
+      color: #FFB74D;
+    }
+
+    [data-theme="dark"] .creator-bar a {
+      color: #FFB74D;
+    }
+
+    /* 隐藏默认导航在创作者页面 */
+    .creator-workspace ~ .navbar,
+    .creator-workspace ~ .main-content {
+      display: none;
+    }
+
+    /* 设置Tab样式 */
+    .settings-section {
+      background: var(--bg-color);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .settings-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .settings-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      min-width: 80px;
+    }
+
+    .settings-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .settings-input:focus {
+      outline: none;
+      border-color: var(--creator-primary-solid);
+    }
+
+    .settings-btn {
+      padding: 12px 24px;
+      background: var(--creator-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .settings-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--creator-shadow);
+    }
+
+    .settings-status {
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .settings-status.success {
+      display: inline-block;
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .settings-status.error {
+      display: inline-block;
+      background: #FFEBEE;
+      color: #C62828;
+    }
+  </style>
 
     /* 创作者工作台主容器 */
     .creator-workspace {
@@ -875,8 +1107,26 @@
   </style>
 </head>
 <body>
+  <!-- 密码门禁界面 -->
+  <div class="password-overlay" id="passwordOverlay">
+    <div class="password-box">
+      <div class="password-icon">🔐</div>
+      <h1 class="password-title">创作者工作台</h1>
+      <p class="password-subtitle">请输入密码以访问</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="输入密码..." autocomplete="off">
+      <button class="password-btn" onclick="checkPassword()">进入</button>
+      <p class="password-error" id="passwordError">密码错误，请重试</p>
+      <a href="index.html" class="password-back">← 返回首页</a>
+    </div>
+  </div>
+
+  <!-- 创作者提示条 -->
+  <div class="creator-bar" id="creatorBar" style="display:none;">
+    🔐 创作者模式 · <a href="index.html">返回读者页面</a> · 密码分享给信任的协作者即可共同编辑
+  </div>
+
   <!-- 侧边栏快捷导航（桌面端） -->
-  <div class="sidebar-toolbar">
+  <div class="sidebar-toolbar" id="sidebarToolbar" style="display:none;">
     <a href="index.html" class="sidebar-btn" title="回首页">
       🏠
       <span class="sidebar-btn-tooltip">回首页</span>
@@ -898,6 +1148,10 @@
       📋
       <span class="sidebar-btn-tooltip">内容管理</span>
     </div>
+    <div class="sidebar-btn" onclick="scrollToSettings()">
+      ⚙️
+      <span class="sidebar-btn-tooltip">设置</span>
+    </div>
     <div class="sidebar-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
       🔝
       <span class="sidebar-btn-tooltip">返回顶部</span>
@@ -905,7 +1159,31 @@
   </div>
 
   <!-- 创作者工作台主内容 -->
-  <div class="creator-workspace">
+  <div class="creator-workspace" id="creatorWorkspace" style="display:none;">
+    <!-- 设置区域 -->
+    <section class="settings-section" id="settingsSection">
+      <h2 class="settings-title">⚙️ 工作台设置</h2>
+      <div class="settings-row">
+        <span class="settings-label">当前密码：</span>
+        <span style="color:var(--text-muted);font-size:14px;" id="currentPasswordStatus">已设置</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">旧密码：</span>
+        <input type="password" class="settings-input" id="oldPassword" placeholder="输入旧密码（留空则不验证）">
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">新密码：</span>
+        <input type="password" class="settings-input" id="newPassword" placeholder="输入新密码">
+        <button class="settings-btn" onclick="changePassword()">修改密码</button>
+      </div>
+      <div class="settings-row">
+        <span class="settings-status" id="passwordStatus"></span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">
+        💡 提示：新密码将保存在浏览器本地存储中。如果忘记密码，清除浏览器数据后恢复为默认密码 <code style="background:var(--bg-light);padding:2px 6px;border-radius:4px;">sahaja2026</code>
+      </p>
+    </section>
+
     <!-- 顶部快捷入口区 -->
     <section class="quick-access-section" id="quickAccess">
       <h2 class="section-title">🎯 快速发布</h2>

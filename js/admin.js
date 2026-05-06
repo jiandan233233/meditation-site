@@ -3,30 +3,85 @@
  * 重新设计的更便捷、直观的后台管理入口
  */
 
-// 板块配置
-const TYPE_CONFIG = {
-  lectures: { icon: '📖', name: '讲座', unit: '篇' },
-  videos: { icon: '🎬', name: '视频', unit: '部' },
-  audios: { icon: '🎵', name: '音频', unit: '条' },
-  images: { icon: '🖼️', name: '图片', unit: '张' },
-  literature: { icon: '📚', name: '经典文献', unit: '篇' },
-  activities: { icon: '🎯', name: '活动', unit: '场' },
-  downloads: { icon: '📥', name: '下载资料', unit: '份' }
-};
+// ========== 密码门禁系统 ==========
 
-const ALL_TYPES = Object.keys(TYPE_CONFIG);
+// 获取创作者密码（优先从localStorage，没有则使用默认密码）
+function getCreatorPassword() {
+  return localStorage.getItem('creator_password') || 'sahaja2026';
+}
 
-// 当前选中的板块
-let currentType = 'lectures';
+// 检查是否已通过验证
+function isCreatorAuth() {
+  return sessionStorage.getItem('creator_auth') === '1';
+}
 
-// 当前编辑的内容
-let editingItem = null;
+// 显示工作台内容
+function showWorkspace() {
+  const overlay = document.getElementById('passwordOverlay');
+  const workspace = document.getElementById('creatorWorkspace');
+  const sidebar = document.getElementById('sidebarToolbar');
+  const creatorBar = document.getElementById('creatorBar');
+  
+  if (overlay) overlay.classList.add('hidden');
+  if (workspace) workspace.style.display = 'block';
+  if (sidebar) sidebar.style.display = '';
+  if (creatorBar) creatorBar.style.display = 'block';
+}
 
-// 图片预览数据
-let imagePreviewData = [];
+// 隐藏工作台内容
+function hideWorkspace() {
+  const overlay = document.getElementById('passwordOverlay');
+  const workspace = document.getElementById('creatorWorkspace');
+  const sidebar = document.getElementById('sidebarToolbar');
+  const creatorBar = document.getElementById('creatorBar');
+  
+  if (overlay) overlay.classList.remove('hidden');
+  if (workspace) workspace.style.display = 'none';
+  if (sidebar) sidebar.style.display = 'none';
+  if (creatorBar) creatorBar.style.display = 'none';
+}
 
-// DOM加载完成后初始化
+// 验证密码
+function checkPassword() {
+  const input = document.getElementById('passwordInput');
+  const errorEl = document.getElementById('passwordError');
+  const password = input.value;
+  
+  if (password === getCreatorPassword()) {
+    sessionStorage.setItem('creator_auth', '1');
+    errorEl.classList.remove('show');
+    showWorkspace();
+    initWorkspace();
+  } else {
+    errorEl.classList.add('show');
+    input.value = '';
+    input.focus();
+  }
+}
+
+// 密码输入框回车事件
 document.addEventListener('DOMContentLoaded', function() {
+  const passwordInput = document.getElementById('passwordInput');
+  if (passwordInput) {
+    passwordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    });
+    passwordInput.focus();
+  }
+  
+  // 检查是否已验证
+  if (isCreatorAuth()) {
+    showWorkspace();
+    initWorkspace();
+  } else {
+    hideWorkspace();
+  }
+});
+
+// 初始化工作台（需要验证通过后才执行）
+function initWorkspace() {
   // 从URL参数获取板块类型
   const urlParams = new URLSearchParams(window.location.search);
   const preType = urlParams.get('type');
@@ -49,7 +104,83 @@ document.addEventListener('DOMContentLoaded', function() {
   // 更新计数
   updateCounts();
   loadManageList('all');
-});
+}
+
+// 修改密码
+function changePassword() {
+  const oldPasswordInput = document.getElementById('oldPassword');
+  const newPasswordInput = document.getElementById('newPassword');
+  const statusEl = document.getElementById('passwordStatus');
+  
+  const oldPassword = oldPasswordInput.value;
+  const newPassword = newPasswordInput.value;
+  
+  // 验证旧密码（如果输入了的话）
+  if (oldPassword && oldPassword !== getCreatorPassword()) {
+    statusEl.className = 'settings-status error';
+    statusEl.textContent = '❌ 旧密码错误';
+    return;
+  }
+  
+  if (!newPassword) {
+    statusEl.className = 'settings-status error';
+    statusEl.textContent = '❌ 请输入新密码';
+    return;
+  }
+  
+  if (newPassword.length < 4) {
+    statusEl.className = 'settings-status error';
+    statusEl.textContent = '❌ 密码至少4位';
+    return;
+  }
+  
+  // 保存新密码
+  localStorage.setItem('creator_password', newPassword);
+  
+  statusEl.className = 'settings-status success';
+  statusEl.textContent = '✅ 密码修改成功';
+  
+  // 清空输入
+  oldPasswordInput.value = '';
+  newPasswordInput.value = '';
+  
+  // 3秒后隐藏状态
+  setTimeout(() => {
+    statusEl.className = 'settings-status';
+  }, 3000);
+}
+
+// 滚动到设置区域
+function scrollToSettings() {
+  const settingsSection = document.getElementById('settingsSection');
+  if (settingsSection) {
+    settingsSection.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ========== 原有代码 ==========
+
+// 板块配置
+const TYPE_CONFIG = {
+  lectures: { icon: '📖', name: '讲座', unit: '篇' },
+  videos: { icon: '🎬', name: '视频', unit: '部' },
+  audios: { icon: '🎵', name: '音频', unit: '条' },
+  images: { icon: '🖼️', name: '图片', unit: '张' },
+  literature: { icon: '📚', name: '经典文献', unit: '篇' },
+  activities: { icon: '🎯', name: '活动', unit: '场' },
+  downloads: { icon: '📥', name: '下载资料', unit: '份' }
+};
+
+const ALL_TYPES = Object.keys(TYPE_CONFIG);
+
+// 当前选中的板块
+let currentType = 'lectures';
+
+// 当前编辑的内容
+let editingItem = null;
+
+// 图片预览数据
+let imagePreviewData = [];
 
 // 初始化快捷卡片
 function initQuickCards() {
