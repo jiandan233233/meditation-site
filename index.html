@@ -7,20 +7,31 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- 导航栏 -->
+  <!-- 导航栏 - 双行设计 -->
   <nav class="navbar">
     <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
     <button class="menu-toggle">☰</button>
     <div class="navbar-menu">
       <a href="index.html" class="nav-item active">首页</a>
-      <a href="lectures.html" class="nav-item">讲座</a>
+      <a href="mother-talks.html" class="nav-item">母亲讲话</a>
+      <a href="meditation-guide.html" class="nav-item">冥想引导</a>
+      <a href="music.html" class="nav-item">音乐</a>
       <a href="videos.html" class="nav-item">视频</a>
-      <a href="audios.html" class="nav-item">音频</a>
       <a href="images.html" class="nav-item">图片</a>
       <a href="literature.html" class="nav-item">经典文献</a>
-      <a href="activities.html" class="nav-item">活动分享</a>
-      <a href="downloads.html" class="nav-item">下载资料</a>
-      <a href="about.html" class="nav-item">关于</a>
+      <a href="mantras.html" class="nav-item">口诀</a>
+      <a href="broadcasts.html" class="nav-item">转播</a>
+      <a href="profile.html" class="nav-item">我的</a>
+    </div>
+    <div class="navbar-menu navbar-menu-bottom">
+      <a href="index.html" class="nav-item-small">最新</a>
+      <a href="search.html" class="nav-item-small">搜索</a>
+      <a href="108-sentences.html" class="nav-item-small">108句话</a>
+      <a href="music.html#audio" class="nav-item-small">音乐音频</a>
+      <a href="music.html#video" class="nav-item-small">音乐视频</a>
+      <a href="activity-videos.html" class="nav-item-small">活动视频</a>
+      <a href="images.html" class="nav-item-small">相册</a>
+      <a href="downloads.html" class="nav-item-small">资料</a>
     </div>
   </nav>
 
@@ -51,6 +62,24 @@
           <a href="lectures.html" class="view-more">查看更多 →</a>
         </div>
         <div class="content-list" id="lecturesList"></div>
+      </div>
+
+      <!-- 母亲讲话 -->
+      <div class="section-preview" id="motherTalksSection" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">母亲讲话</h2>
+          <a href="mother-talks.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="motherTalksList"></div>
+      </div>
+
+      <!-- 冥想引导 -->
+      <div class="section-preview" id="meditationGuideSection" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">冥想引导</h2>
+          <a href="meditation-guide.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="meditationGuideList"></div>
       </div>
 
       <!-- 视频 -->
@@ -89,6 +118,33 @@
         <div class="content-list" id="literatureList"></div>
       </div>
 
+      <!-- 口诀 -->
+      <div class="section-preview" id="mantrasSection" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">口诀</h2>
+          <a href="mantras.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="mantrasList"></div>
+      </div>
+
+      <!-- 108句话 -->
+      <div class="section-preview" id="sentences108Section" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">108句话</h2>
+          <a href="108-sentences.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="sentences108List"></div>
+      </div>
+
+      <!-- 转播 -->
+      <div class="section-preview" id="broadcastsSection" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">转播</h2>
+          <a href="broadcasts.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="broadcastsList"></div>
+      </div>
+
       <!-- 各地活动 -->
       <div class="section-preview" id="activitiesSection" style="display:none;">
         <div class="section-header">
@@ -96,6 +152,15 @@
           <a href="activities.html" class="view-more">查看更多 →</a>
         </div>
         <div class="content-list" id="activitiesList"></div>
+      </div>
+
+      <!-- 活动视频 -->
+      <div class="section-preview" id="activityVideosSection" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">活动视频</h2>
+          <a href="activity-videos.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="activityVideosList"></div>
       </div>
 
       <!-- 下载资料 -->
@@ -195,6 +260,48 @@
         if (downloadsData.length > 0) {
           document.getElementById('downloadsSection').style.display = 'block';
           renderContentList(downloadsData.slice(0, 3), document.getElementById('downloadsList'), true, 'downloads');
+        }
+        
+        // 母亲讲话
+        const motherTalksData = content.mother_talks || [];
+        if (motherTalksData.length > 0) {
+          document.getElementById('motherTalksSection').style.display = 'block';
+          renderContentList(motherTalksData.slice(0, 3), document.getElementById('motherTalksList'), true, 'mother_talks');
+        }
+        
+        // 冥想引导
+        const meditationGuideData = content.meditation_guide || [];
+        if (meditationGuideData.length > 0) {
+          document.getElementById('meditationGuideSection').style.display = 'block';
+          renderContentList(meditationGuideData.slice(0, 3), document.getElementById('meditationGuideList'), true, 'meditation_guide');
+        }
+        
+        // 口诀
+        const mantrasData = content.mantras || [];
+        if (mantrasData.length > 0) {
+          document.getElementById('mantrasSection').style.display = 'block';
+          renderContentList(mantrasData.slice(0, 3), document.getElementById('mantrasList'), true, 'mantras');
+        }
+        
+        // 108句话
+        const sentences108Data = content.sentences_108 || [];
+        if (sentences108Data.length > 0) {
+          document.getElementById('sentences108Section').style.display = 'block';
+          renderContentList(sentences108Data.slice(0, 3), document.getElementById('sentences108List'), true, 'sentences_108');
+        }
+        
+        // 转播
+        const broadcastsData = content.broadcasts || [];
+        if (broadcastsData.length > 0) {
+          document.getElementById('broadcastsSection').style.display = 'block';
+          renderContentList(broadcastsData.slice(0, 3), document.getElementById('broadcastsList'), true, 'broadcasts');
+        }
+        
+        // 活动视频
+        const activityVideosData = content.activity_videos || [];
+        if (activityVideosData.length > 0) {
+          document.getElementById('activityVideosSection').style.display = 'block';
+          renderContentList(activityVideosData.slice(0, 3), document.getElementById('activityVideosList'), true, 'activity_videos');
         }
         
       } catch (e) {

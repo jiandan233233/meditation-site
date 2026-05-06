@@ -29,7 +29,16 @@ const STORAGE_KEYS = {
   literature: 'site_literature',
   activities: 'site_activities',
   downloads: 'site_downloads',
-  comments: 'site_comments'
+  comments: 'site_comments',
+  // 新增内容类型
+  mother_talks: 'site_mother_talks',
+  broadcasts: 'site_broadcasts',
+  mantras: 'site_mantras',
+  sentences_108: 'site_sentences_108',
+  meditation_guide: 'site_meditation_guide',
+  music_audio: 'site_music_audio',
+  music_video: 'site_music_video',
+  activity_videos: 'site_activity_videos'
 };
 
 // 默认数据
@@ -49,7 +58,16 @@ const DEFAULT_DATA = {
   images: [],
   literature: [],
   activities: [],
-  downloads: []
+  downloads: [],
+  // 新增默认数据
+  mother_talks: [],
+  broadcasts: [],
+  mantras: [],
+  sentences_108: [],
+  meditation_guide: [],
+  music_audio: [],
+  music_video: [],
+  activity_videos: []
 };
 
 // ========== GitHub API 函数 ==========

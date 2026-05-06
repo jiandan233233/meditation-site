@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的 - Sahaja Yoga</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .profile-header {
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 36px;
+    }
+    .profile-title {
+      color: white;
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+    .profile-section {
+      background: var(--bg-light);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .profile-section-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .favorites-list, .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .favorite-item, .history-item {
+      background: var(--bg-color);
+      border-radius: 6px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .favorite-item:hover, .history-item:hover {
+      background: var(--border-color);
+    }
+    .favorite-item-title, .history-item-title {
+      font-size: 14px;
+      color: var(--link-color);
+      margin-bottom: 4px;
+    }
+    .favorite-item-meta, .history-item-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .theme-switch-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .theme-switch-label {
+      font-size: 14px;
+      color: var(--text-color);
+    }
+    .theme-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+    }
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .theme-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+    .theme-slider:before {
+      position: absolute;
+      content: "☀️";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-slider.dark {
+      background-color: #1a73e8;
+    }
+    .theme-slider.dark:before {
+      content: "🌙";
+      transform: translateX(22px);
+    }
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .quick-link:hover {
+      border-color: var(--nav-blue);
+      color: var(--nav-blue);
+    }
+    .quick-link-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 - 双行设计 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item">首页</a>
+      <a href="mother-talks.html" class="nav-item">母亲讲话</a>
+      <a href="meditation-guide.html" class="nav-item">冥想引导</a>
+      <a href="music.html" class="nav-item">音乐</a>
+      <a href="videos.html" class="nav-item">视频</a>
+      <a href="images.html" class="nav-item">图片</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="mantras.html" class="nav-item">口诀</a>
+      <a href="broadcasts.html" class="nav-item">转播</a>
+      <a href="profile.html" class="nav-item active">我的</a>
+    </div>
+    <div class="navbar-menu navbar-menu-bottom">
+      <a href="index.html" class="nav-item-small">最新</a>
+      <a href="search.html" class="nav-item-small">搜索</a>
+      <a href="108-sentences.html" class="nav-item-small">108句话</a>
+      <a href="music.html#audio" class="nav-item-small">音乐音频</a>
+      <a href="music.html#video" class="nav-item-small">音乐视频</a>
+      <a href="activity-videos.html" class="nav-item-small">活动视频</a>
+      <a href="images.html" class="nav-item-small">相册</a>
+      <a href="downloads.html" class="nav-item-small">资料</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <div class="profile-header">
+      <div class="profile-avatar">🧘</div>
+      <div class="profile-title">我的收藏</div>
+    </div>
+
+    <div class="container">
+      <!-- 设置 -->
+      <div class="profile-section">
+        <div class="profile-section-title">⚙️ 设置</div>
+        <div class="theme-switch-box">
+          <span class="theme-switch-label">🌙 暗黑模式</span>
+          <label class="theme-switch">
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+            <span class="theme-slider" id="themeSlider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 快捷链接 -->
+      <div class="profile-section">
+        <div class="profile-section-title">🔗 快捷链接</div>
+        <div class="quick-links">
+          <a href="admin.html" class="quick-link">
+            <span class="quick-link-icon">✎</span>
+            <span>创作者工作台</span>
+          </a>
+          <a href="search.html" class="quick-link">
+            <span class="quick-link-icon">🔍</span>
+            <span>搜索内容</span>
+          </a>
+          <a href="index.html" class="quick-link">
+            <span class="quick-link-icon">🏠</span>
+            <span>返回首页</span>
+          </a>
+          <a href="mother-talks.html" class="quick-link">
+            <span class="quick-link-icon">👩</span>
+            <span>母亲讲话</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 收藏 -->
+      <div class="profile-section">
+        <div class="profile-section-title">❤️ 收藏</div>
+        <div class="favorites-list" id="favoritesList">
+          <div class="empty-state">暂无收藏内容</div>
+        </div>
+      </div>
+
+      <!-- 最近浏览 -->
+      <div class="profile-section">
+        <div class="profile-section-title">📜 最近浏览</div>
+        <div class="history-list" id="historyList">
+          <div class="empty-state">暂无浏览记录</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
+    © 2026 Sahaja Yoga · Free Meditation Resources
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initTheme();
+      loadFavorites();
+      loadHistory();
+    });
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const checkbox = document.getElementById('themeToggle');
+      const slider = document.getElementById('themeSlider');
+      
+      if (savedTheme === 'dark') {
+        checkbox.checked = true;
+        slider.classList.add('dark');
+      }
+    }
+
+    function toggleTheme() {
+      const checkbox = document.getElementById('themeToggle');
+      const slider = document.getElementById('themeSlider');
+      const body = document.documentElement;
+      
+      if (checkbox.checked) {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        slider.classList.add('dark');
+      } else {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        slider.classList.remove('dark');
+      }
+    }
+
+    function loadFavorites() {
+      const favorites = JSON.parse(localStorage.getItem('site_favorites') || '[]');
+      const container = document.getElementById('favoritesList');
+      
+      if (favorites.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无收藏内容</div>';
+        return;
+      }
+      
+      container.innerHTML = favorites.map(item => `
+        <div class="favorite-item" onclick="goToDetail('${item.id}', '${item.type}')">
+          <div class="favorite-item-title">${item.title}</div>
+          <div class="favorite-item-meta">${item.typeName || item.type} · ${item.date || ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem('site_history') || '[]');
+      const container = document.getElementById('historyList');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无浏览记录</div>';
+        return;
+      }
+      
+      // 只显示最近10条
+      const recentHistory = history.slice(0, 10);
+      container.innerHTML = recentHistory.map(item => `
+        <div class="history-item" onclick="goToDetail('${item.id}', '${item.type}')">
+          <div class="history-item-title">${item.title}</div>
+          <div class="history-item-meta">${item.typeName || item.type} · ${item.date || ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function goToDetail(id, type) {
+      window.location.href = `detail.html?id=${id}&type=${type}`;
+    }
+  </script>
+</body>
+</html>

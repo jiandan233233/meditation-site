@@ -288,7 +288,16 @@ const TYPE_CONFIG = {
   images: { icon: '🖼️', name: '图片', unit: '张' },
   literature: { icon: '📚', name: '经典文献', unit: '篇' },
   activities: { icon: '🎯', name: '活动', unit: '场' },
-  downloads: { icon: '📥', name: '下载资料', unit: '份' }
+  downloads: { icon: '📥', name: '下载资料', unit: '份' },
+  // 新增内容类型
+  mother_talks: { icon: '👩', name: '母亲讲话', unit: '篇' },
+  broadcasts: { icon: '📡', name: '转播', unit: '条' },
+  mantras: { icon: '🕉️', name: '口诀', unit: '条' },
+  sentences_108: { icon: '💬', name: '108句话', unit: '句' },
+  meditation_guide: { icon: '🧘', name: '冥想引导', unit: '篇' },
+  music_audio: { icon: '🎶', name: '音乐音频', unit: '首' },
+  music_video: { icon: '🎹', name: '音乐视频', unit: '首' },
+  activity_videos: { icon: '📹', name: '活动视频', unit: '部' }
 };
 
 const ALL_TYPES = Object.keys(TYPE_CONFIG);
