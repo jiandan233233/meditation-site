@@ -10,7 +10,7 @@ function getCreatorPassword() {
 }
 
 function isCreatorAuth() {
-  return sessionStorage.getItem('creator_auth') === '1';
+  return sessionStorage.getItem('creator_auth') === '1' || localStorage.getItem('creator_auth') === '1';
 }
 
 function showWorkspace() {
@@ -40,10 +40,16 @@ function hideWorkspace() {
 function checkPassword() {
   const input = document.getElementById('passwordInput');
   const errorEl = document.getElementById('passwordError');
+  const rememberCheckbox = document.getElementById('rememberPassword');
   const password = input.value;
   
   if (password === getCreatorPassword()) {
-    sessionStorage.setItem('creator_auth', '1');
+    // 根据是否勾选"记住密码"决定存储位置
+    if (rememberCheckbox && rememberCheckbox.checked) {
+      localStorage.setItem('creator_auth', '1');
+    } else {
+      sessionStorage.setItem('creator_auth', '1');
+    }
     errorEl.classList.remove('show');
     showWorkspace();
     initWorkspace();
@@ -251,8 +257,12 @@ function changePassword() {
   
   localStorage.setItem('creator_password', newPassword);
   
+  // 修改密码后清除认证状态，需要重新验证
+  sessionStorage.removeItem('creator_auth');
+  localStorage.removeItem('creator_auth');
+  
   statusEl.className = 'settings-status success';
-  statusEl.textContent = '✅ 密码修改成功';
+  statusEl.textContent = '✅ 密码修改成功，请重新输入密码';
   
   oldPasswordInput.value = '';
   newPasswordInput.value = '';

@@ -254,7 +254,6 @@
       background: #FFEBEE;
       color: #C62828;
     }
-  </style>
 
     /* 创作者工作台主容器 */
     .creator-workspace {
@@ -1114,6 +1113,9 @@
       <h1 class="password-title">创作者工作台</h1>
       <p class="password-subtitle">请输入密码以访问</p>
       <input type="password" class="password-input" id="passwordInput" placeholder="输入密码..." autocomplete="off">
+      <label class="remember-label">
+        <input type="checkbox" id="rememberPassword"> 记住密码
+      </label>
       <button class="password-btn" onclick="checkPassword()">进入</button>
       <p class="password-error" id="passwordError">密码错误，请重试</p>
       <a href="index.html" class="password-back">← 返回首页</a>
