@@ -1162,6 +1162,49 @@
 
   <!-- 创作者工作台主内容 -->
   <div class="creator-workspace" id="creatorWorkspace" style="display:none;">
+
+    <!-- 顶部快捷入口区 -->
+    <section class="quick-access-section" id="quickAccess">
+      <h2 class="section-title">🎯 快速发布</h2>
+      <div class="quick-cards">
+        <div class="quick-card" data-type="lectures" onclick="selectType('lectures')">
+          <span class="quick-card-icon">📖</span>
+          <div class="quick-card-title">讲座</div>
+          <div class="quick-card-count" id="count-lectures">0 篇</div>
+        </div>
+        <div class="quick-card" data-type="videos" onclick="selectType('videos')">
+          <span class="quick-card-icon">🎬</span>
+          <div class="quick-card-title">视频</div>
+          <div class="quick-card-count" id="count-videos">0 部</div>
+        </div>
+        <div class="quick-card" data-type="audios" onclick="selectType('audios')">
+          <span class="quick-card-icon">🎵</span>
+          <div class="quick-card-title">音频</div>
+          <div class="quick-card-count" id="count-audios">0 条</div>
+        </div>
+        <div class="quick-card" data-type="images" onclick="selectType('images')">
+          <span class="quick-card-icon">🖼️</span>
+          <div class="quick-card-title">图片</div>
+          <div class="quick-card-count" id="count-images">0 张</div>
+        </div>
+        <div class="quick-card" data-type="literature" onclick="selectType('literature')">
+          <span class="quick-card-icon">📚</span>
+          <div class="quick-card-title">经典文献</div>
+          <div class="quick-card-count" id="count-literature">0 篇</div>
+        </div>
+        <div class="quick-card" data-type="activities" onclick="selectType('activities')">
+          <span class="quick-card-icon">🎯</span>
+          <div class="quick-card-title">活动</div>
+          <div class="quick-card-count" id="count-activities">0 场</div>
+        </div>
+        <div class="quick-card" data-type="downloads" onclick="selectType('downloads')">
+          <span class="quick-card-icon">📥</span>
+          <div class="quick-card-title">下载资料</div>
+          <div class="quick-card-count" id="count-downloads">0 份</div>
+        </div>
+      </div>
+    </section>
+
     <!-- 设置区域 -->
     <section class="settings-section" id="settingsSection">
       <h2 class="settings-title">⚙️ 工作台设置</h2>
@@ -1211,48 +1254,6 @@
       <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">
         💡 提示：新密码将保存在浏览器本地存储中。如果忘记密码，清除浏览器数据后恢复为默认密码 <code style="background:var(--bg-light);padding:2px 6px;border-radius:4px;">sahaja2026</code>
       </p>
-    </section>
-
-    <!-- 顶部快捷入口区 -->
-    <section class="quick-access-section" id="quickAccess">
-      <h2 class="section-title">🎯 快速发布</h2>
-      <div class="quick-cards">
-        <div class="quick-card" data-type="lectures" onclick="selectType('lectures')">
-          <span class="quick-card-icon">📖</span>
-          <div class="quick-card-title">讲座</div>
-          <div class="quick-card-count" id="count-lectures">0 篇</div>
-        </div>
-        <div class="quick-card" data-type="videos" onclick="selectType('videos')">
-          <span class="quick-card-icon">🎬</span>
-          <div class="quick-card-title">视频</div>
-          <div class="quick-card-count" id="count-videos">0 部</div>
-        </div>
-        <div class="quick-card" data-type="audios" onclick="selectType('audios')">
-          <span class="quick-card-icon">🎵</span>
-          <div class="quick-card-title">音频</div>
-          <div class="quick-card-count" id="count-audios">0 条</div>
-        </div>
-        <div class="quick-card" data-type="images" onclick="selectType('images')">
-          <span class="quick-card-icon">🖼️</span>
-          <div class="quick-card-title">图片</div>
-          <div class="quick-card-count" id="count-images">0 张</div>
-        </div>
-        <div class="quick-card" data-type="literature" onclick="selectType('literature')">
-          <span class="quick-card-icon">📚</span>
-          <div class="quick-card-title">经典文献</div>
-          <div class="quick-card-count" id="count-literature">0 篇</div>
-        </div>
-        <div class="quick-card" data-type="activities" onclick="selectType('activities')">
-          <span class="quick-card-icon">🎯</span>
-          <div class="quick-card-title">活动</div>
-          <div class="quick-card-count" id="count-activities">0 场</div>
-        </div>
-        <div class="quick-card" data-type="downloads" onclick="selectType('downloads')">
-          <span class="quick-card-icon">📥</span>
-          <div class="quick-card-title">下载资料</div>
-          <div class="quick-card-count" id="count-downloads">0 份</div>
-        </div>
-      </div>
     </section>
 
     <!-- 发布表单区域 -->
