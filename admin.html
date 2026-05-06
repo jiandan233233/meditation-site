@@ -1307,6 +1307,7 @@
               <div class="upload-icon">🎬</div>
               <div class="upload-text">拖拽视频文件到这里，或点击选择文件</div>
               <div class="upload-hint">支持 MP4、WebM 格式，建议小于 100MB</div>
+              <span id="videoFileName" style="display:none;margin-top:8px;color:var(--creator-primary-solid);font-size:13px;"></span>
               <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/ogg" style="display:none;">
             </div>
             <div id="videoPreview" style="display:none;margin-top:16px;">
@@ -1331,6 +1332,7 @@
               <div class="upload-icon">🎵</div>
               <div class="upload-text">拖拽音频文件到这里，或点击选择文件</div>
               <div class="upload-hint">支持 MP3、WAV、OGG 格式，建议小于 50MB</div>
+              <span id="audioFileName" style="display:none;margin-top:8px;color:var(--creator-primary-solid);font-size:13px;"></span>
               <input type="file" id="audioFileInput" accept="audio/mpeg,audio/wav,audio/ogg,audio/*" style="display:none;">
             </div>
             <div id="audioPreview" style="display:none;margin-top:16px;">
@@ -1375,7 +1377,7 @@
 
         <!-- 操作按钮 -->
         <div class="form-actions">
-          <button type="submit" class="btn-publish">
+          <button type="submit" class="btn-publish" id="submitBtn">
             <span>🚀</span> 发布内容
           </button>
           <button type="button" class="btn-preview" onclick="previewContent()">
@@ -1390,7 +1392,7 @@
       <h2 class="section-title">📋 内容管理</h2>
       <div class="manage-tabs" id="manageTabs">
         <button class="manage-tab active" data-type="all">
-          全部 <span class="manage-tab-count" id="count-all">0</span>
+          全部 <span class="manage-tab-count" id="count-all">0</span><span class="manage-tab-count" id="tab-count-all">0</span>
         </button>
         <button class="manage-tab" data-type="lectures">
           📖 讲座 <span class="manage-tab-count" id="tab-count-lectures">0</span>
