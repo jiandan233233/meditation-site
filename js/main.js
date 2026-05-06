@@ -133,6 +133,8 @@ function getCurrentType() {
   const typeMap = {
     'lectures.html': 'lectures',
     'videos.html': 'videos',
+    'audios.html': 'audios',
+    'images.html': 'images',
     'literature.html': 'literature',
     'activities.html': 'activities',
     'downloads.html': 'downloads'

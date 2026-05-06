@@ -13,18 +13,13 @@
     <button class="menu-toggle">☰</button>
     <div class="navbar-menu">
       <a href="index.html" class="nav-item">首页</a>
-      <div class="nav-item nav-item-dropdown">
-        浏览内容
-        <div class="dropdown-menu">
-          <a href="lectures.html" class="dropdown-item">讲座</a>
-          <a href="videos.html" class="dropdown-item">视频</a>
-          <a href="literature.html" class="dropdown-item">经典文献文库</a>
-          <a href="activities.html" class="dropdown-item">各地活动分享</a>
-          <a href="downloads.html" class="dropdown-item">下载资料</a>
-        </div>
-      </div>
-      <a href="about.html" class="nav-item">关于本站</a>
-      <a href="admin.html" class="nav-item">后台管理</a>
+      <a href="lectures.html" class="nav-item active">讲座</a>
+      <a href="videos.html" class="nav-item">视频</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item">✏️ 发布</a>
     </div>
   </nav>
 
@@ -32,7 +27,7 @@
   <main class="main-content">
     <!-- 板块标题横幅 -->
     <div class="page-banner">
-      <h1>讲座</h1>
+      <h1>讲座 <a href="admin.html?type=lectures" class="publish-btn">✏️ 发布内容</a></h1>
     </div>
 
     <div class="container">
@@ -58,6 +53,10 @@
       <div class="pagination" id="pagination"></div>
     </div>
   </main>
+
+  <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
+    © 2026 Sahaja Yoga · Free Meditation Resources
+  </footer>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>

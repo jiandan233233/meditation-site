@@ -13,25 +13,22 @@
     <button class="menu-toggle">☰</button>
     <div class="navbar-menu">
       <a href="index.html" class="nav-item">首页</a>
-      <div class="nav-item nav-item-dropdown">
-        浏览内容
-        <div class="dropdown-menu">
-          <a href="lectures.html" class="dropdown-item">讲座</a>
-          <a href="videos.html" class="dropdown-item">视频</a>
-          <a href="literature.html" class="dropdown-item">经典文献文库</a>
-          <a href="activities.html" class="dropdown-item">各地活动分享</a>
-          <a href="downloads.html" class="dropdown-item">下载资料</a>
-        </div>
-      </div>
-      <a href="about.html" class="nav-item">关于本站</a>
-      <a href="admin.html" class="nav-item active">后台管理</a>
+      <a href="lectures.html" class="nav-item">讲座</a>
+      <a href="videos.html" class="nav-item">视频</a>
+      <a href="audios.html" class="nav-item">音频</a>
+      <a href="images.html" class="nav-item">图片</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item active">✏️ 发布</a>
     </div>
   </nav>
 
   <!-- 主内容 -->
   <main class="main-content">
     <div class="container">
-      <h1 style="font-size:20px;font-weight:500;margin-bottom:24px;">后台管理</h1>
+      <h1 style="font-size:20px;font-weight:500;margin-bottom:24px;">✏️ 发布内容</h1>
 
       <!-- Tab切换 -->
       <div class="admin-tabs">
@@ -47,8 +44,10 @@
             <select class="form-select" name="type">
               <option value="lectures">讲座</option>
               <option value="videos">视频</option>
+              <option value="audios">音频</option>
+              <option value="images">图片</option>
               <option value="literature">经典文献</option>
-              <option value="activities">各地活动</option>
+              <option value="activities">活动分享</option>
               <option value="downloads">下载资料</option>
             </select>
           </div>
@@ -85,8 +84,9 @@
             <input type="file" class="form-input" id="coverImage" accept="image/*">
           </div>
 
-          <div class="form-group" id="videoUrlGroup">
-            <label class="form-label">视频（可选）</label>
+          <!-- 视频上传区域 -->
+          <div class="form-group" id="videoUrlGroup" style="display:none;">
+            <label class="form-label">视频（仅视频板块）</label>
             <div class="video-input-tabs">
               <button type="button" class="video-tab active" onclick="switchVideoTab('embed')">B站/嵌入链接</button>
               <button type="button" class="video-tab" onclick="switchVideoTab('upload')">上传本地视频</button>
@@ -105,7 +105,50 @@
             </div>
           </div>
 
-          <div class="form-group" id="downloadUrlGroup">
+          <!-- 音频上传区域 -->
+          <div class="form-group" id="audioUrlGroup" style="display:none;">
+            <label class="form-label">音频（仅音频板块）</label>
+            <div class="video-input-tabs">
+              <button type="button" class="video-tab active" onclick="switchAudioTab('embed')">音频链接</button>
+              <button type="button" class="video-tab" onclick="switchAudioTab('upload')">上传本地音频</button>
+            </div>
+            <div id="audioEmbedInput" class="video-input-panel">
+              <p class="form-hint">支持音频链接（MP3、WAV等格式URL）</p>
+              <input type="text" class="form-input" name="audioUrl" placeholder="输入音频文件URL">
+            </div>
+            <div id="audioUploadInput" class="video-input-panel" style="display:none;">
+              <p class="form-hint">选择本地音频文件（MP3格式，建议20MB以内）</p>
+              <input type="file" class="form-input" name="audioFile" accept="audio/mpeg,audio/wav,audio/ogg,audio/*" id="audioFileInput">
+              <div id="audioFilePreview" style="display:none;margin-top:8px;">
+                <audio id="previewAudio" controls style="width:100%;max-width:400px;"></audio>
+                <button type="button" onclick="clearAudioFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除音频</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 图片上传区域 -->
+          <div class="form-group" id="imageUrlGroup" style="display:none;">
+            <label class="form-label">图片（仅图片板块）</label>
+            <div class="video-input-tabs">
+              <button type="button" class="video-tab active" onclick="switchImageTab('embed')">图片链接</button>
+              <button type="button" class="video-tab" onclick="switchImageTab('upload')">上传本地图片</button>
+            </div>
+            <div id="imageEmbedInput" class="video-input-panel">
+              <p class="form-hint">输入图片URL</p>
+              <input type="text" class="form-input" name="imageUrl" placeholder="输入图片URL">
+            </div>
+            <div id="imageUploadInput" class="video-input-panel" style="display:none;">
+              <p class="form-hint">选择本地图片文件（建议小于5MB）</p>
+              <input type="file" class="form-input" name="imageFile" accept="image/*" id="imageFileInput">
+              <div id="imageFilePreview" style="display:none;margin-top:8px;">
+                <img id="previewImage" style="max-width:100%;max-height:300px;border-radius:4px;">
+                <button type="button" onclick="clearImageFile()" style="margin-top:4px;color:#e74c3c;font-size:12px;">✕ 移除图片</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 下载链接区域 -->
+          <div class="form-group" id="downloadUrlGroup" style="display:none;">
             <label class="form-label">下载链接（仅下载区填写）</label>
             <input type="text" class="form-input" name="downloadUrl" placeholder="文件下载链接">
           </div>
@@ -159,8 +202,18 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">视频嵌入链接</label>
+          <label class="form-label">视频链接</label>
           <input type="text" class="form-input" name="videoUrl">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">音频链接</label>
+          <input type="text" class="form-input" name="audioUrl">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">图片链接</label>
+          <input type="text" class="form-input" name="imageUrl">
         </div>
 
         <div class="form-group">
@@ -178,16 +231,33 @@
   <script src="js/admin.js"></script>
   <script>
     // 根据选择的板块显示/隐藏特定字段
-    document.querySelector('select[name="type"]').addEventListener('change', function() {
-      const type = this.value;
+    function updateFormFields() {
+      const type = document.querySelector('select[name="type"]').value;
       const videoGroup = document.getElementById('videoUrlGroup');
+      const audioGroup = document.getElementById('audioUrlGroup');
+      const imageGroup = document.getElementById('imageUrlGroup');
       const downloadGroup = document.getElementById('downloadUrlGroup');
       
       videoGroup.style.display = type === 'videos' ? 'block' : 'none';
+      audioGroup.style.display = type === 'audios' ? 'block' : 'none';
+      imageGroup.style.display = type === 'images' ? 'block' : 'none';
       downloadGroup.style.display = type === 'downloads' ? 'block' : 'none';
-    });
-  </script>
-<script>
+    }
+
+    document.querySelector('select[name="type"]').addEventListener('change', updateFormFields);
+
+    // 从URL参数获取板块类型
+    const urlParams = new URLSearchParams(window.location.search);
+    const preType = urlParams.get('type');
+    if (preType) {
+      const select = document.querySelector('select[name="type"]');
+      if (select) {
+        select.value = preType;
+        updateFormFields();
+      }
+    }
+
+    // 视频Tab切换
     function switchVideoTab(tab) {
       document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.video-input-panel').forEach(p => p.style.display = 'none');
@@ -215,6 +285,76 @@
       document.getElementById('videoFileInput').value = '';
       document.getElementById('videoFilePreview').style.display = 'none';
       document.getElementById('previewVideo').src = '';
+    }
+
+    // 音频Tab切换
+    function switchAudioTab(tab) {
+      document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.video-input-panel').forEach(p => p.style.display = 'none'));
+      
+      const audioTabs = document.querySelectorAll('#audioUrlGroup .video-tab');
+      const audioPanels = document.querySelectorAll('#audioUrlGroup .video-input-panel');
+      audioTabs.forEach(t => t.classList.remove('active'));
+      audioPanels.forEach(p => p.style.display = 'none');
+      
+      if (tab === 'embed') {
+        document.getElementById('audioEmbedInput').style.display = 'block';
+        audioTabs[0].classList.add('active');
+      } else {
+        document.getElementById('audioUploadInput').style.display = 'block';
+        audioTabs[1].classList.add('active');
+      }
+    }
+
+    // 本地音频预览
+    document.getElementById('audioFileInput')?.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        document.getElementById('previewAudio').src = url;
+        document.getElementById('audioFilePreview').style.display = 'block';
+      }
+    });
+
+    function clearAudioFile() {
+      document.getElementById('audioFileInput').value = '';
+      document.getElementById('audioFilePreview').style.display = 'none';
+      document.getElementById('previewAudio').src = '';
+    }
+
+    // 图片Tab切换
+    function switchImageTab(tab) {
+      const imageTabs = document.querySelectorAll('#imageUrlGroup .video-tab');
+      const imagePanels = document.querySelectorAll('#imageUrlGroup .video-input-panel');
+      imageTabs.forEach(t => t.classList.remove('active'));
+      imagePanels.forEach(p => p.style.display = 'none');
+      
+      if (tab === 'embed') {
+        document.getElementById('imageEmbedInput').style.display = 'block';
+        imageTabs[0].classList.add('active');
+      } else {
+        document.getElementById('imageUploadInput').style.display = 'block';
+        imageTabs[1].classList.add('active');
+      }
+    }
+
+    // 本地图片预览
+    document.getElementById('imageFileInput')?.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('previewImage').src = ev.target.result;
+          document.getElementById('imageFilePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function clearImageFile() {
+      document.getElementById('imageFileInput').value = '';
+      document.getElementById('imageFilePreview').style.display = 'none';
+      document.getElementById('previewImage').src = '';
     }
   </script>
 </body>

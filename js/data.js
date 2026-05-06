@@ -6,6 +6,8 @@
 const STORAGE_KEYS = {
   lectures: 'site_lectures',
   videos: 'site_videos',
+  audios: 'site_audios',
+  images: 'site_images',
   literature: 'site_literature',
   activities: 'site_activities',
   downloads: 'site_downloads',
@@ -195,6 +197,58 @@ const DEFAULT_DATA = {
       category: '图文资料',
       summary: '详细图解冥想常用姿势及要点提示。',
       content: '<p>本资料详细图解冥想时常用的几种姿势：</p><ul><li><strong>莲花坐（Padmasana）</strong>：经典冥想姿势</li><li><strong>半莲花坐</strong>：适合初学者的变体</li><li><strong>跪坐</strong>：适合西方人的姿势</li><li><strong>椅子上坐</strong>：简单实用的选择</li><li><strong>仰卧</strong>：适合放松与入睡</li></ul><p>每种姿势都配有：</p><ul><li>标准示范图</li><li>身体各部位要点</li><li>常见错误纠正</li><li>适用场景说明</li></ul><p><strong>文件格式：</strong>PDF + 图片<br><strong>下载链接：</strong>请在内容详情页获取。</p>'
+    }
+  ],
+  audios: [
+    {
+      id: 'audio_1',
+      title: '晨间冥想引导 10分钟',
+      date: '2026-05-03',
+      category: '冥想引导',
+      summary: '清晨10分钟冥想引导音频',
+      content: '<p>用这段10分钟的引导音频开始你美好的一天。</p><p>这音频适合：</p><ul><li>早晨起床后</li><li>需要提神醒脑时</li><li>开始一天工作前</li></ul>'
+    },
+    {
+      id: 'audio_2',
+      title: '深度放松 - 身体扫描',
+      date: '2026-04-25',
+      category: '放松音频',
+      summary: '从头到脚的全身扫描放松引导',
+      content: '<p>这段身体扫描音频将帮助你从头到脚释放紧张。</p><p>适合：</p><ul><li>睡前放松</li><li>减压放松</li><li>缓解焦虑</li></ul>'
+    },
+    {
+      id: 'audio_3',
+      title: '自然白噪音 - 森林雨声',
+      date: '2026-04-15',
+      category: '环境音',
+      summary: '30分钟森林雨声，适合冥想和睡眠',
+      content: '<p>纯粹的自然雨声，帮助你放松和专注。</p><p>适合：</p><ul><li>冥想时作为背景音</li><li>助眠</li><li>专注工作</li></ul>'
+    }
+  ],
+  images: [
+    {
+      id: 'image_1',
+      title: '喜马拉雅山冥想圣地',
+      date: '2026-05-01',
+      category: '圣地巡礼',
+      summary: '印度喜马拉雅山区的冥想修行圣地',
+      content: '<p>位于印度北部的喜马拉雅山区，自古以来就是冥想修行者的圣地。</p><p>这里群山环绕，空气清新，是静心冥想的绝佳场所。</p>'
+    },
+    {
+      id: 'image_2',
+      title: '莲花坐姿参考',
+      date: '2026-04-20',
+      category: '姿势参考',
+      summary: '标准莲花坐姿势图解',
+      content: '<p>莲花坐（Padmasana）是最经典的冥想姿势。</p><p>这个姿势有助于打开髋关节，保持脊柱挺直，促进气的流动。</p>'
+    },
+    {
+      id: 'image_3',
+      title: '冥想曼陀罗图案',
+      date: '2026-04-10',
+      category: '冥想辅助',
+      summary: '用于专注和冥想的曼陀罗图案',
+      content: '<p>曼陀罗是冥想中常用的视觉聚焦工具。</p><p>凝视曼陀罗可以帮助集中注意力，进入更深层的意识状态。</p>'
     }
   ]
 };

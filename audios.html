@@ -3,209 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="冥想音频资源 - 舒缓的冥想音频引导，伴你进入深度放松">
-  <title>冥想音频 - Sahaja Yoga</title>
-  
+  <title>音频 - Sahaja Yoga</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">
-        <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
-          <circle cx="20" cy="20" r="18" stroke="#7B9E87" stroke-width="2"/>
-          <circle cx="20" cy="20" r="12" stroke="#D4A574" stroke-width="1.5"/>
-          <circle cx="20" cy="20" r="5" fill="#7B9E87"/>
-        </svg>
-        <span class="logo-text">Sahaja Yoga</span>
-      </a>
-      
-      <button class="menu-toggle" aria-label="菜单">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      
-      <nav class="nav">
-        <a href="index.html" class="nav-link">首页</a>
-        <a href="videos.html" class="nav-link">视频</a>
-        <a href="audios.html" class="nav-link active">音频</a>
-        <a href="articles.html" class="nav-link">文章</a>
-        <a href="search.html" class="nav-link">搜索</a>
-      </nav>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
+    <button class="menu-toggle">☰</button>
+    <div class="navbar-menu">
+      <a href="index.html" class="nav-item">首页</a>
+      <a href="lectures.html" class="nav-item">讲座</a>
+      <a href="videos.html" class="nav-item">视频</a>
+      <a href="audios.html" class="nav-item active">音频</a>
+      <a href="images.html" class="nav-item">图片</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item">✏️ 发布</a>
     </div>
-  </header>
+  </nav>
 
-  <!-- Page Header -->
-  <section class="page-header">
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 板块标题横幅 -->
+    <div class="page-banner">
+      <h1>音频 <a href="admin.html?type=audios" class="publish-btn">✏️ 发布内容</a></h1>
+    </div>
+
     <div class="container">
-      <h1 class="page-title">冥想音频</h1>
-      <p class="page-subtitle">舒缓的冥想音频引导，伴你进入深度放松</p>
-    </div>
-  </section>
+      <!-- 说明文字 -->
+      <p class="section-desc">聆听冥想引导音频，随时随地跟随练习，获得身心的放松与平静。</p>
 
-  <!-- Audio List -->
-  <section class="content-section">
-    <div class="container">
-      <!-- Filter Tabs -->
-      <div class="filter-tabs">
-        <button class="filter-tab active" data-filter="all">全部</button>
-        <button class="filter-tab" data-filter="morning">清晨唤醒</button>
-        <button class="filter-tab" data-filter="relaxation">放松减压</button>
-        <button class="filter-tab" data-filter="sleep">睡前冥想</button>
-        <button class="filter-tab" data-filter="breathing">呼吸练习</button>
+      <!-- 搜索框 -->
+      <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索音频标题或关键词...">
+        <button class="search-btn" onclick="performSearch('audios')">搜索</button>
       </div>
-      
-      <!-- Audio List -->
-      <div class="cards-grid" style="grid-template-columns: 1fr;">
-        <div class="audio-player" data-category="morning">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">清晨5分钟正念唤醒</h4>
-              <p class="audio-duration">5:30 · 引导冥想</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        
-        <div class="audio-player" data-category="sleep">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">深度睡眠引导冥想</h4>
-              <p class="audio-duration">20:00 · 睡前放松</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        
-        <div class="audio-player" data-category="relaxation">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">紧张焦虑缓解音频</h4>
-              <p class="audio-duration">12:45 · 减压放松</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        
-        <div class="audio-player" data-category="breathing">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">4-7-8呼吸法练习</h4>
-              <p class="audio-duration">8:00 · 呼吸调节</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        
-        <div class="audio-player" data-category="morning">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">感恩晨间冥想</h4>
-              <p class="audio-duration">10:15 · 积极心态</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        
-        <div class="audio-player" data-category="relaxation">
-          <div class="audio-player-card">
-            <div class="audio-cover">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
-            </div>
-            <div class="audio-info">
-              <h4 class="audio-title">身体扫描渐进式放松</h4>
-              <p class="audio-duration">18:30 · 深度放松</p>
-              <div class="audio-controls">
-                <button class="play-btn">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div class="audio-progress">
-                  <div class="audio-progress-bar" style="width: 0%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources</p>
-      <div class="footer-links">
-        <a href="admin/index.html" class="footer-link">管理后台</a>
-        <a href="search.html" class="footer-link">搜索</a>
+      <!-- 分类筛选 -->
+      <div class="filter-bar">
+        <div class="filter-tags" id="filterTags"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 暗黑模式</button>
       </div>
+
+      <!-- 内容列表 -->
+      <div class="content-list" id="contentList"></div>
+
+      <!-- 分页 -->
+      <div class="pagination" id="pagination"></div>
     </div>
+  </main>
+
+  <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
+    © 2026 Sahaja Yoga · Free Meditation Resources
   </footer>
 
-  <script src="js/fuse.min.js"></script>
+  <script src="js/data.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    const PAGE_SIZE = 10;
+    let currentPage = 1;
+    let filteredData = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initPage();
+    });
+
+    function initPage() {
+      const data = getAllData('audios');
+      filteredData = data;
+      
+      // 渲染分类标签
+      const categories = getCategories('audios');
+      renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
+      
+      // 渲染列表
+      renderPage(1);
+      
+      // 搜索功能
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch('audios');
+        }
+      });
+    }
+
+    function filterByCategory(category) {
+      if (!category) {
+        filteredData = getAllData('audios');
+      } else {
+        filteredData = getAllData('audios').filter(item => item.category === category);
+      }
+      renderPage(1);
+    }
+
+    function performSearch(type) {
+      const keyword = document.getElementById('searchInput').value.trim();
+      filteredData = searchData(type, keyword);
+      renderPage(1);
+    }
+
+    function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageData = filteredData.slice(start, end);
+      
+      const container = document.getElementById('contentList');
+      if (pageData.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无内容</div>';
+      } else {
+        renderAudioList(pageData, container);
+      }
+      
+      renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);
+    }
+
+    // 渲染音频列表（带播放图标和播放器）
+    function renderAudioList(items, container) {
+      if (!container) return;
+      
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无音频</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="content-item has-audio" onclick="goToDetail('${item.id}', 'audios')">
+          <div class="item-header">
+            <span class="item-category">🎵 ${item.category || '冥想'}</span>
+            <span class="item-date">${item.date}</span>
+          </div>
+          <span class="item-title">${item.title}</span>
+          ${item.summary ? `<div class="item-summary">${item.summary}</div>` : ''}
+          ${item.audioUrl ? `<div class="audio-inline-player" onclick="event.stopPropagation();">
+            <audio controls src="${item.audioUrl}" style="width:100%;height:36px;margin-top:8px;"></audio>
+          </div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if (current === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+  </script>
 </body>
 </html>

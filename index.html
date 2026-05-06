@@ -13,18 +13,15 @@
     <button class="menu-toggle">☰</button>
     <div class="navbar-menu">
       <a href="index.html" class="nav-item active">首页</a>
-      <div class="nav-item nav-item-dropdown">
-        浏览内容
-        <div class="dropdown-menu">
-          <a href="lectures.html" class="dropdown-item">讲座</a>
-          <a href="videos.html" class="dropdown-item">视频</a>
-          <a href="literature.html" class="dropdown-item">经典文献文库</a>
-          <a href="activities.html" class="dropdown-item">各地活动分享</a>
-          <a href="downloads.html" class="dropdown-item">下载资料</a>
-        </div>
-      </div>
-      <a href="about.html" class="nav-item">关于本站</a>
-      <a href="admin.html" class="nav-item">后台管理</a>
+      <a href="lectures.html" class="nav-item">讲座</a>
+      <a href="videos.html" class="nav-item">视频</a>
+      <a href="audios.html" class="nav-item">音频</a>
+      <a href="images.html" class="nav-item">图片</a>
+      <a href="literature.html" class="nav-item">经典文献</a>
+      <a href="activities.html" class="nav-item">活动分享</a>
+      <a href="downloads.html" class="nav-item">下载资料</a>
+      <a href="about.html" class="nav-item">关于</a>
+      <a href="admin.html" class="nav-item">✏️ 发布</a>
     </div>
   </nav>
 
@@ -60,6 +57,24 @@
         <div class="content-list" id="videosList"></div>
       </div>
 
+      <!-- 音频 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">音频</h2>
+          <a href="audios.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="content-list" id="audiosList"></div>
+      </div>
+
+      <!-- 图片 -->
+      <div class="section-preview">
+        <div class="section-header">
+          <h2 class="section-title">图片</h2>
+          <a href="images.html" class="view-more">查看更多 →</a>
+        </div>
+        <div class="image-grid-preview" id="imagesList"></div>
+      </div>
+
       <!-- 经典文献 -->
       <div class="section-preview">
         <div class="section-header">
@@ -89,6 +104,10 @@
     </div>
   </main>
 
+  <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
+    © 2026 Sahaja Yoga · Free Meditation Resources
+  </footer>
+
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
   <script>
@@ -107,14 +126,61 @@
 
     // 加载各板块预览
     function loadPreviewSections() {
-      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+      const types = ['lectures', 'videos', 'audios', 'literature', 'activities', 'downloads'];
       types.forEach(type => {
         const data = getAllData(type);
         const container = document.getElementById(type + 'List');
         if (container) {
-          renderContentList(data.slice(0, 3), container, true, type);
+          if (type === 'audios') {
+            renderAudioList(data.slice(0, 3), container);
+          } else {
+            renderContentList(data.slice(0, 3), container, true, type);
+          }
         }
       });
+      
+      // 图片预览
+      const imagesData = getAllData('images');
+      const imagesContainer = document.getElementById('imagesList');
+      if (imagesContainer) {
+        renderImagePreview(imagesData.slice(0, 4), imagesContainer);
+      }
+    }
+    
+    // 渲染音频预览列表
+    function renderAudioList(items, container) {
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无音频</div>';
+        return;
+      }
+      container.innerHTML = items.map(item => `
+        <div class="content-item has-audio" onclick="goToDetail('${item.id}', 'audios')">
+          <div class="item-header">
+            <span class="item-category">🎵 ${item.category || '冥想'}</span>
+            <span class="item-date">${item.date}</span>
+          </div>
+          <span class="item-title">${item.title}</span>
+          ${item.summary ? `<div class="item-summary">${item.summary}</div>` : ''}
+        </div>
+      `).join('');
+    }
+    
+    // 渲染图片预览
+    function renderImagePreview(items, container) {
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无图片</div>';
+        return;
+      }
+      container.innerHTML = items.map(item => `
+        <div class="image-card-small" onclick="goToDetail('${item.id}', 'images')">
+          <div class="image-thumb">
+            ${item.imageUrl 
+              ? `<img src="${item.imageUrl}" alt="${item.title}" onerror="this.parentElement.innerHTML='🖼️'">` 
+              : '🖼️'}
+          </div>
+          <div class="image-info-title">${item.title}</div>
+        </div>
+      `).join('');
     }
 
     // 全局搜索

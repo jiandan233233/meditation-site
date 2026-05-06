@@ -133,7 +133,7 @@ function convertImageToBase64(file, callback) {
 }
 
 // 提交表单
-function submitForm() {
+async function submitForm() {
   const form = document.getElementById('publishForm');
   if (!form) return;
 
@@ -143,13 +143,48 @@ function submitForm() {
   const category = form.querySelector('input[name="category"]').value.trim();
   const summary = form.querySelector('textarea[name="summary"]').value.trim();
   const content = form.querySelector('textarea[name="content"]').value.trim();
-  const videoUrl = form.querySelector('input[name="videoUrl"]').value.trim();
   const downloadUrl = form.querySelector('input[name="downloadUrl"]').value.trim();
   const coverImage = form.querySelector('input[name="coverImage"]')?.value || '';
 
   if (!title || !content) {
     alert('请填写标题和内容');
     return;
+  }
+
+  // 处理视频
+  let videoUrl = '';
+  const videoFileInput = document.getElementById('videoFileInput');
+  const videoEmbedInput = form.querySelector('input[name="videoUrl"]');
+  if (type === 'videos') {
+    if (videoFileInput && videoFileInput.files && videoFileInput.files[0]) {
+      videoUrl = await fileToBase64(videoFileInput.files[0]);
+    } else if (videoEmbedInput && videoEmbedInput.value.trim()) {
+      videoUrl = videoEmbedInput.value.trim();
+    }
+  }
+
+  // 处理音频
+  let audioUrl = '';
+  const audioFileInput = document.getElementById('audioFileInput');
+  const audioEmbedInput = form.querySelector('input[name="audioUrl"]');
+  if (type === 'audios') {
+    if (audioFileInput && audioFileInput.files && audioFileInput.files[0]) {
+      audioUrl = await fileToBase64(audioFileInput.files[0]);
+    } else if (audioEmbedInput && audioEmbedInput.value.trim()) {
+      audioUrl = audioEmbedInput.value.trim();
+    }
+  }
+
+  // 处理图片
+  let imageUrl = '';
+  const imageFileInput = document.getElementById('imageFileInput');
+  const imageEmbedInput = form.querySelector('input[name="imageUrl"]');
+  if (type === 'images') {
+    if (imageFileInput && imageFileInput.files && imageFileInput.files[0]) {
+      imageUrl = await fileToBase64(imageFileInput.files[0]);
+    } else if (imageEmbedInput && imageEmbedInput.value.trim()) {
+      imageUrl = imageEmbedInput.value.trim();
+    }
   }
 
   const item = {
@@ -159,6 +194,8 @@ function submitForm() {
     summary,
     content,
     videoUrl,
+    audioUrl,
+    imageUrl,
     downloadUrl,
     coverImage
   };
@@ -167,11 +204,31 @@ function submitForm() {
     alert('发布成功！');
     form.reset();
     document.getElementById('coverPreview')?.remove();
+    document.getElementById('videoFilePreview')?.remove();
+    document.getElementById('audioFilePreview')?.remove();
+    document.getElementById('imageFilePreview')?.remove();
     document.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
     loadAdminList();
+    // 重新初始化表单状态
+    const select = document.querySelector('select[name="type"]');
+    if (select) {
+      select.dispatchEvent(new Event('change'));
+    }
   } else {
     alert('发布失败，请重试');
   }
+}
+
+// 文件转Base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      resolve(e.target.result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // 加载管理列表
@@ -179,12 +236,14 @@ function loadAdminList() {
   const container = document.querySelector('.admin-list');
   if (!container) return;
 
-  const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+  const types = ['lectures', 'videos', 'audios', 'images', 'literature', 'activities', 'downloads'];
   const typeNames = {
     lectures: '讲座',
     videos: '视频',
+    audios: '音频',
+    images: '图片',
     literature: '经典文献',
-    activities: '各地活动',
+    activities: '活动分享',
     downloads: '下载资料'
   };
 

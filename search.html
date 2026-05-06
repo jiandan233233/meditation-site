@@ -15,11 +15,13 @@
       <a href="index.html" class="nav-item">首页</a>
       <a href="lectures.html" class="nav-item">讲座</a>
       <a href="videos.html" class="nav-item">视频</a>
+      <a href="audios.html" class="nav-item">音频</a>
+      <a href="images.html" class="nav-item">图片</a>
       <a href="literature.html" class="nav-item">经典文献</a>
       <a href="activities.html" class="nav-item">活动分享</a>
       <a href="downloads.html" class="nav-item">下载资料</a>
       <a href="about.html" class="nav-item">关于</a>
-      <a href="admin.html" class="nav-item nav-creator">✏️ 发布</a>
+      <a href="admin.html" class="nav-item">✏️ 发布</a>
     </div>
   </nav>
 
@@ -69,6 +71,8 @@
     const TYPE_NAMES = {
       lectures: '讲座',
       videos: '视频',
+      audios: '音频',
+      images: '图片',
       literature: '经典文献',
       activities: '活动分享',
       downloads: '下载资料'
@@ -78,8 +82,10 @@
     const TYPE_COLORS = {
       lectures: '#FF8C42',
       videos: '#4CAF50',
+      audios: '#9C27B0',
+      images: '#FF5722',
       literature: '#2196F3',
-      activities: '#9C27B0',
+      activities: '#E91E63',
       downloads: '#795548'
     };
 
@@ -110,7 +116,7 @@
       }
 
       const results = [];
-      const types = ['lectures', 'videos', 'literature', 'activities', 'downloads'];
+      const types = ['lectures', 'videos', 'audios', 'images', 'literature', 'activities', 'downloads'];
       
       types.forEach(type => {
         const data = getAllData(type);

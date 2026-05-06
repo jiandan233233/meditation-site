@@ -13,6 +13,8 @@
   const TYPE_NAMES = {
     lectures: '讲座',
     videos: '视频',
+    audios: '音频',
+    images: '图片',
     literature: '经典文献',
     activities: '活动分享',
     downloads: '下载资料'
@@ -85,12 +87,40 @@
       categoryEl.style.display = 'none';
     }
 
-    // 视频区
+    // 媒体区 - 根据类型显示视频、音频或图片
     const videoSection = document.getElementById('detail-video');
     const videoWrapper = document.getElementById('video-wrapper');
-    if (videoSection && videoWrapper && currentItem.videoUrl) {
+    
+    if (videoSection && videoWrapper) {
       videoSection.style.display = 'block';
-      videoWrapper.innerHTML = getVideoEmbed(currentItem.videoUrl);
+      videoWrapper.innerHTML = '';
+      
+      // 视频
+      if (currentItem.videoUrl) {
+        videoWrapper.innerHTML = getVideoEmbed(currentItem.videoUrl);
+      }
+      // 音频
+      else if (currentItem.audioUrl) {
+        videoWrapper.innerHTML = `
+          <div class="audio-player-detail">
+            <div style="padding:20px;background:var(--bg-light);border-radius:8px;text-align:center;">
+              <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">🔊 ${currentItem.title}</div>
+              ${getAudioEmbed(currentItem.audioUrl)}
+            </div>
+          </div>
+        `;
+      }
+      // 图片
+      else if (currentItem.imageUrl) {
+        videoWrapper.innerHTML = `
+          <div class="image-viewer">
+            ${getImageEmbed(currentItem.imageUrl)}
+          </div>
+        `;
+      }
+      else {
+        videoSection.style.display = 'none';
+      }
     }
 
     // 正文内容
@@ -103,6 +133,11 @@
   // 生成视频嵌入HTML
   function getVideoEmbed(url) {
     if (!url) return '';
+
+    // Base64视频
+    if (url.startsWith('data:video/')) {
+      return `<video src="${url}" controls style="width:100%;border-radius:8px;"></video>`;
+    }
 
     // B站视频
     if (url.includes('bilibili.com') || url.match(/^BV[\w]+$/)) {
@@ -128,9 +163,9 @@
       }
     }
 
-    // HTML5视频
-    if (url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) || url.includes('.mp4') || url.includes('.webm')) {
-      return `<video src="${url}" controls></video>`;
+    // HTML5视频（URL或本地文件）
+    if (url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) || url.includes('.mp4') || url.includes('.webm') || url.startsWith('blob:')) {
+      return `<video src="${url}" controls style="width:100%;border-radius:8px;"></video>`;
     }
 
     // 直接是iframe代码
@@ -140,6 +175,32 @@
 
     // 默认：假设是嵌入链接
     return `<iframe src="${url}" allowfullscreen></iframe>`;
+  }
+
+  // 生成音频嵌入HTML
+  function getAudioEmbed(url) {
+    if (!url) return '';
+    
+    // Base64音频
+    if (url.startsWith('data:audio/')) {
+      return `<audio src="${url}" controls style="width:100%;margin-top:12px;"></audio>`;
+    }
+    
+    // 普通URL
+    return `<audio src="${url}" controls style="width:100%;margin-top:12px;"></audio>`;
+  }
+
+  // 生成图片嵌入HTML
+  function getImageEmbed(url) {
+    if (!url) return '';
+    
+    // Base64图片
+    if (url.startsWith('data:image/')) {
+      return `<img src="${url}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`;
+    }
+    
+    // 普通URL
+    return `<img src="${url}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`;
   }
 
   // 提取B站视频ID
