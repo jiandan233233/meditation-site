@@ -138,11 +138,11 @@ async function saveGithubToken() {
     return;
   }
 
-  // 验证 Token 是否有效
+  // 先保存 Token，再验证
   showLoading('正在验证 Token...');
+  setGithubToken(token);
   try {
     const testResult = await githubApi('GET', '/user');
-    setGithubToken(token);
     hideLoading();
     closeTokenModal();
     showToast('✅ Token 配置成功！');
@@ -151,6 +151,8 @@ async function saveGithubToken() {
     clearCache();
     await refreshAllData();
   } catch (e) {
+    // 验证失败，清除 Token
+    localStorage.removeItem(CONFIG.TOKEN_KEY);
     hideLoading();
     showTokenError('Token 无效: ' + e.message);
   }
