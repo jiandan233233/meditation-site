@@ -373,6 +373,13 @@ function switchUploadTab(type, tabName) {
 function initUploadAreas() {
   // 视频预览
   initDropZone('videoDropZone', 'videoFileInput', (file) => {
+    // 检查视频格式，只支持浏览器可播放的格式
+    const validExts = ['.mp4', '.webm', '.ogg'];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!validExts.includes(ext)) {
+      showToast('❌ 视频格式不支持，请选择 MP4、WebM 或 OGG 格式（iPhone请选择"MP4"导出）');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       document.getElementById('previewVideoPlayer').src = e.target.result;
@@ -422,6 +429,14 @@ function initUploadAreas() {
   document.getElementById('videoFileInput')?.addEventListener('change', (e) => {
     if (e.target.files[0]) {
       const file = e.target.files[0];
+      // 检查视频格式
+      const validExts = ['.mp4', '.webm', '.ogg'];
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (!validExts.includes(ext)) {
+        showToast('❌ 视频格式不支持，请选择 MP4、WebM 或 OGG 格式');
+        e.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (ev) => {
         document.getElementById('previewVideoPlayer').src = ev.target.result;
