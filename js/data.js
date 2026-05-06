@@ -183,8 +183,17 @@ async function updateContentJson(data, message = '更新内容') {
 
 /**
  * 上传媒体文件到仓库
+ * 注意：GitHub Contents API 对文件大小有限制（约1MB base64编码后）
+ * 因此限制为 5MB，超过则提示使用嵌入链接方式
  */
 async function uploadMedia(file, directory) {
+  // 文件大小限制：5MB
+  const MAX_SIZE = 5 * 1024 * 1024;
+  
+  if (file.size > MAX_SIZE) {
+    throw new Error('视频文件超过5MB限制。建议：\n1. 上传到B站后使用嵌入链接\n2. 或压缩视频后重试\n\n推荐使用B站嵌入，体验更好且无文件大小限制。');
+  }
+  
   showLoading(`正在上传 ${file.name}...`);
   
   try {
@@ -218,8 +227,16 @@ async function uploadMedia(file, directory) {
 
 /**
  * 上传图片（内嵌在内容中的小图片）
+ * 注意：小文件继续用 Contents API，超过1MB则提示
  */
 async function uploadInlineImage(file) {
+  // 图片文件限制：1MB（base64后约1.37MB）
+  const MAX_SIZE = 1 * 1024 * 1024;
+  
+  if (file.size > MAX_SIZE) {
+    throw new Error('图片文件超过1MB限制。请压缩图片后重试（建议压缩到500KB以下）。');
+  }
+  
   showLoading(`正在上传图片 ${file.name}...`);
   
   try {

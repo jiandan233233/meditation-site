@@ -1306,7 +1306,8 @@
             <div class="media-upload-area" id="videoDropZone">
               <div class="upload-icon">🎬</div>
               <div class="upload-text">拖拽视频文件到这里，或点击选择文件</div>
-              <div class="upload-hint">支持 MP4、WebM 格式，建议小于 100MB</div>
+              <div class="upload-hint">支持 MP4、WebM 格式，建议小于 5MB</div>
+              <div class="upload-hint" style="color: #ff9800; margin-top: 8px;">💡 大视频请上传到B站后使用嵌入链接，体验更好！</div>
               <span id="videoFileName" style="display:none;margin-top:8px;color:var(--creator-primary-solid);font-size:13px;"></span>
               <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/ogg" style="display:none;">
             </div>
@@ -1331,7 +1332,8 @@
             <div class="media-upload-area" id="audioDropZone">
               <div class="upload-icon">🎵</div>
               <div class="upload-text">拖拽音频文件到这里，或点击选择文件</div>
-              <div class="upload-hint">支持 MP3、WAV、OGG 格式，建议小于 50MB</div>
+              <div class="upload-hint">支持 MP3、WAV、OGG 格式，建议小于 5MB</div>
+              <div class="upload-hint" style="color: #ff9800; margin-top: 8px;">💡 大音频文件请使用云存储外链（如阿里云OSS）</div>
               <span id="audioFileName" style="display:none;margin-top:8px;color:var(--creator-primary-solid);font-size:13px;"></span>
               <input type="file" id="audioFileInput" accept="audio/mpeg,audio/wav,audio/ogg,audio/*" style="display:none;">
             </div>
