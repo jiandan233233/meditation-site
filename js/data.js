@@ -164,29 +164,48 @@ async function fetchContentJson() {
 }
 
 /**
- * 更新 content.json（需要 token）
+ * 更新 content.json（使用 Git Data API，与 uploadMedia 统一）
+ * 
+ * 问题：原 Contents API 在 uploadMedia 之后会因 SHA 不匹配导致 409 Conflict
+ * 解决：改用 Git Data API，每次获取最新 HEAD commit，避免冲突
  */
 async function updateContentJson(data, message = '更新内容') {
   showLoading('正在保存到 GitHub...');
   
   try {
     const path = 'data/content.json';
-    const sha = await getFileSha(path);
     
+    // 转换为 base64
     const content = JSON.stringify(data, null, 2);
     const base64Content = btoa(unescape(encodeURIComponent(content)));
     
-    const body = {
-      message: message,
-      content: base64Content,
-      branch: CONFIG.GITHUB_BRANCH
-    };
+    // 步骤1: 创建 blob
+    showLoading('正在创建数据文件...');
+    const blobSha = await createBlob(base64Content);
     
-    if (sha) {
-      body.sha = sha;
-    }
-
-    await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
+    // 步骤2: 获取 HEAD commit SHA（每次都获取最新，避免与 uploadMedia 冲突）
+    showLoading('正在获取仓库信息...');
+    const headCommitSha = await getHeadRef();
+    
+    // 步骤3: 获取 commit 的 tree SHA
+    const commitData = await getCommit(headCommitSha);
+    const baseTreeSha = commitData.tree.sha;
+    
+    // 步骤4: 创建新 tree
+    showLoading('正在更新文件索引...');
+    const newTreeSha = await createTree(baseTreeSha, [{
+      path: path,
+      mode: '100644',
+      type: 'blob',
+      sha: blobSha
+    }]);
+    
+    // 步骤5: 创建新 commit
+    showLoading('正在提交更改...');
+    const newCommitSha = await createCommit(message, newTreeSha, headCommitSha);
+    
+    // 步骤6: 更新 ref
+    await updateRef(`heads/${CONFIG.GITHUB_BRANCH}`, newCommitSha);
     
     // 更新本地缓存
     setCache(data);
