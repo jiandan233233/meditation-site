@@ -32,15 +32,20 @@
     </div>
 
     <div class="container">
+      <!-- 加载状态 -->
+      <div id="loadingState" style="text-align:center;padding:40px;color:var(--text-muted);">
+        ⏳ 正在加载内容...
+      </div>
+
       <!-- 搜索框 -->
-      <div class="search-box">
+      <div class="search-box" id="searchBox" style="display:none;">
         <input type="text" class="search-input" id="globalSearch" placeholder="搜索讲座、视频、文献...">
         <button class="search-btn" onclick="globalSearch()">搜索</button>
         <button class="share-btn" onclick="openSharePanel('Sahaja Yoga - 免费冥想资源平台', window.location.href)" style="flex-shrink:0;">🔗 分享</button>
       </div>
 
       <!-- 讲座 -->
-      <div class="section-preview">
+      <div class="section-preview" id="lecturesSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">讲座</h2>
           <a href="lectures.html" class="view-more">查看更多 →</a>
@@ -49,7 +54,7 @@
       </div>
 
       <!-- 视频 -->
-      <div class="section-preview">
+      <div class="section-preview" id="videosSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">视频</h2>
           <a href="videos.html" class="view-more">查看更多 →</a>
@@ -58,7 +63,7 @@
       </div>
 
       <!-- 音频 -->
-      <div class="section-preview">
+      <div class="section-preview" id="audiosSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">音频</h2>
           <a href="audios.html" class="view-more">查看更多 →</a>
@@ -67,7 +72,7 @@
       </div>
 
       <!-- 图片 -->
-      <div class="section-preview">
+      <div class="section-preview" id="imagesSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">图片</h2>
           <a href="images.html" class="view-more">查看更多 →</a>
@@ -76,7 +81,7 @@
       </div>
 
       <!-- 经典文献 -->
-      <div class="section-preview">
+      <div class="section-preview" id="literatureSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">经典文献文库</h2>
           <a href="literature.html" class="view-more">查看更多 →</a>
@@ -85,7 +90,7 @@
       </div>
 
       <!-- 各地活动 -->
-      <div class="section-preview">
+      <div class="section-preview" id="activitiesSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">各地活动分享</h2>
           <a href="activities.html" class="view-more">查看更多 →</a>
@@ -94,7 +99,7 @@
       </div>
 
       <!-- 下载资料 -->
-      <div class="section-preview">
+      <div class="section-preview" id="downloadsSection" style="display:none;">
         <div class="section-header">
           <h2 class="section-title">下载资料</h2>
           <a href="downloads.html" class="view-more">查看更多 →</a>
@@ -117,33 +122,84 @@
       
       // 搜索功能
       const searchInput = document.getElementById('globalSearch');
-      searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          globalSearch();
-        }
-      });
+      if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            globalSearch();
+          }
+        });
+      }
     });
 
     // 加载各板块预览
-    function loadPreviewSections() {
-      const types = ['lectures', 'videos', 'audios', 'literature', 'activities', 'downloads'];
-      types.forEach(type => {
-        const data = getAllData(type);
-        const container = document.getElementById(type + 'List');
-        if (container) {
-          if (type === 'audios') {
-            renderAudioList(data.slice(0, 3), container);
-          } else {
-            renderContentList(data.slice(0, 3), container, true, type);
+    async function loadPreviewSections() {
+      try {
+        // 从 GitHub 加载数据
+        const content = await fetchContentJson();
+        
+        // 保存到本地缓存
+        Object.keys(content).forEach(key => {
+          if (key !== 'lastUpdated' && content[key]) {
+            saveAllData(key, content[key]);
           }
+        });
+        
+        // 显示页面
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('searchBox').style.display = 'flex';
+        
+        // 讲座
+        const lecturesData = content.lectures || [];
+        if (lecturesData.length > 0) {
+          document.getElementById('lecturesSection').style.display = 'block';
+          renderContentList(lecturesData.slice(0, 3), document.getElementById('lecturesList'), true, 'lectures');
         }
-      });
-      
-      // 图片预览
-      const imagesData = getAllData('images');
-      const imagesContainer = document.getElementById('imagesList');
-      if (imagesContainer) {
-        renderImagePreview(imagesData.slice(0, 4), imagesContainer);
+        
+        // 视频
+        const videosData = content.videos || [];
+        if (videosData.length > 0) {
+          document.getElementById('videosSection').style.display = 'block';
+          renderContentList(videosData.slice(0, 3), document.getElementById('videosList'), true, 'videos');
+        }
+        
+        // 音频
+        const audiosData = content.audios || [];
+        if (audiosData.length > 0) {
+          document.getElementById('audiosSection').style.display = 'block';
+          renderAudioList(audiosData.slice(0, 3), document.getElementById('audiosList'));
+        }
+        
+        // 图片
+        const imagesData = content.images || [];
+        if (imagesData.length > 0) {
+          document.getElementById('imagesSection').style.display = 'block';
+          renderImagePreview(imagesData.slice(0, 4), document.getElementById('imagesList'));
+        }
+        
+        // 文献
+        const literatureData = content.literature || [];
+        if (literatureData.length > 0) {
+          document.getElementById('literatureSection').style.display = 'block';
+          renderContentList(literatureData.slice(0, 3), document.getElementById('literatureList'), true, 'literature');
+        }
+        
+        // 活动
+        const activitiesData = content.activities || [];
+        if (activitiesData.length > 0) {
+          document.getElementById('activitiesSection').style.display = 'block';
+          renderContentList(activitiesData.slice(0, 3), document.getElementById('activitiesList'), true, 'activities');
+        }
+        
+        // 下载
+        const downloadsData = content.downloads || [];
+        if (downloadsData.length > 0) {
+          document.getElementById('downloadsSection').style.display = 'block';
+          renderContentList(downloadsData.slice(0, 3), document.getElementById('downloadsList'), true, 'downloads');
+        }
+        
+      } catch (e) {
+        console.error('加载失败:', e);
+        document.getElementById('loadingState').innerHTML = '⚠️ 加载失败，请刷新重试';
       }
     }
     
@@ -174,8 +230,8 @@
       container.innerHTML = items.map(item => `
         <div class="image-card-small" onclick="goToDetail('${item.id}', 'images')">
           <div class="image-thumb">
-            ${item.imageUrl 
-              ? `<img src="${item.imageUrl}" alt="${item.title}" onerror="this.parentElement.innerHTML='🖼️'">` 
+            ${item.imageUrl && !item.imageUrl.includes('|||')
+              ? `<img src="${item.imageUrl.split('|||')[0]}" alt="${item.title}" onerror="this.parentElement.innerHTML='🖼️'">` 
               : '🖼️'}
           </div>
           <div class="image-info-title">${item.title}</div>
@@ -190,6 +246,23 @@
       
       // 跳转到搜索页面
       window.location.href = 'search.html?q=' + encodeURIComponent(keyword);
+    }
+
+    // 分享功能
+    function openSharePanel(title, url) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: url
+        }).catch(console.error);
+      } else {
+        // 复制链接
+        navigator.clipboard.writeText(url).then(() => {
+          alert('链接已复制到剪贴板');
+        }).catch(() => {
+          prompt('复制链接:', url);
+        });
+      }
     }
   </script>
 </body>

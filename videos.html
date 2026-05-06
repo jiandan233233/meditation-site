@@ -46,8 +46,13 @@
         <button class="theme-toggle" onclick="toggleTheme()">🌓 暗黑模式</button>
       </div>
 
+      <!-- 加载状态 -->
+      <div id="loadingState" style="text-align:center;padding:40px;color:var(--text-muted);">
+        ⏳ 正在加载内容...
+      </div>
+
       <!-- 内容列表 -->
-      <div class="content-list" id="contentList"></div>
+      <div class="content-list" id="contentList" style="display:none;"></div>
 
       <!-- 分页 -->
       <div class="pagination" id="pagination"></div>
@@ -64,21 +69,36 @@
     const PAGE_SIZE = 10;
     let currentPage = 1;
     let filteredData = [];
+    let allCategories = [];
 
     document.addEventListener('DOMContentLoaded', function() {
       initPage();
     });
 
-    function initPage() {
-      const data = getAllData('videos');
-      filteredData = data;
-      
-      // 渲染分类标签
-      const categories = getCategories('videos');
-      renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
-      
-      // 渲染列表
-      renderPage(1);
+    async function initPage() {
+      try {
+        // 从 GitHub 加载数据
+        const content = await fetchContentJson();
+        const data = content.videos || [];
+        
+        // 保存到本地缓存
+        saveAllData('videos', data);
+        filteredData = data;
+        allCategories = getCategories('videos');
+        
+        // 渲染分类标签
+        renderFilterTags(allCategories, document.getElementById('filterTags'), filterByCategory);
+        
+        // 隐藏加载状态，显示内容
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('contentList').style.display = 'block';
+        
+        // 渲染列表
+        renderPage(1);
+      } catch (e) {
+        console.error('加载失败:', e);
+        document.getElementById('loadingState').innerHTML = '⚠️ 加载失败，请刷新重试';
+      }
       
       // 搜索功能
       document.getElementById('searchInput').addEventListener('keypress', function(e) {

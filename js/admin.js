@@ -1,21 +1,18 @@
 /**
- * 创作者工作台脚本
- * 重新设计的更便捷、直观的后台管理入口
+ * 创作者工作台脚本 - GitHub API 版本
+ * 使用 GitHub Contents API 存储内容
  */
 
 // ========== 密码门禁系统 ==========
 
-// 获取创作者密码（优先从localStorage，没有则使用默认密码）
 function getCreatorPassword() {
   return localStorage.getItem('creator_password') || 'sahaja2026';
 }
 
-// 检查是否已通过验证
 function isCreatorAuth() {
   return sessionStorage.getItem('creator_auth') === '1';
 }
 
-// 显示工作台内容
 function showWorkspace() {
   const overlay = document.getElementById('passwordOverlay');
   const workspace = document.getElementById('creatorWorkspace');
@@ -28,7 +25,6 @@ function showWorkspace() {
   if (creatorBar) creatorBar.style.display = 'block';
 }
 
-// 隐藏工作台内容
 function hideWorkspace() {
   const overlay = document.getElementById('passwordOverlay');
   const workspace = document.getElementById('creatorWorkspace');
@@ -41,7 +37,6 @@ function hideWorkspace() {
   if (creatorBar) creatorBar.style.display = 'none';
 }
 
-// 验证密码
 function checkPassword() {
   const input = document.getElementById('passwordInput');
   const errorEl = document.getElementById('passwordError');
@@ -59,7 +54,6 @@ function checkPassword() {
   }
 }
 
-// 密码输入框回车事件
 document.addEventListener('DOMContentLoaded', function() {
   const passwordInput = document.getElementById('passwordInput');
   if (passwordInput) {
@@ -71,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordInput.focus();
   }
   
-  // 检查是否已验证
   if (isCreatorAuth()) {
     showWorkspace();
     initWorkspace();
@@ -80,13 +73,112 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 初始化工作台（需要验证通过后才执行）
-function initWorkspace() {
+// ========== GitHub Token 配置 ==========
+
+function checkGithubToken() {
+  const token = getGithubToken();
+  if (!token) {
+    return false;
+  }
+  return true;
+}
+
+function showTokenSetup() {
+  const modal = document.createElement('div');
+  modal.id = 'tokenModal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+  `;
+  modal.innerHTML = `
+    <div style="background: var(--bg-color); padding: 32px; border-radius: 16px; max-width: 480px; width: 90%;">
+      <h2 style="margin-bottom: 16px;">⚙️ 配置 GitHub Token</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+        为了将内容保存到 GitHub 仓库，需要配置 GitHub Personal Access Token。
+      </p>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 13px; background: var(--bg-light); padding: 12px; border-radius: 8px;">
+        <strong>创建 Token 步骤：</strong><br>
+        1. 访问 GitHub → Settings → Developer settings<br>
+        2. Personal access tokens → Generate new token<br>
+        3. 勾选 <code>repo</code> 权限<br>
+        4. 生成并复制 Token
+      </p>
+      <input type="password" id="tokenInput" placeholder="粘贴 GitHub Token..." 
+        style="width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--bg-color); color: var(--text-color); margin-bottom: 16px; box-sizing: border-box;">
+      <div style="display: flex; gap: 12px;">
+        <button onclick="saveGithubToken()" style="flex: 1; padding: 12px; background: var(--creator-primary-solid); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">保存 Token</button>
+        <button onclick="closeTokenModal()" style="flex: 1; padding: 12px; background: var(--bg-light); color: var(--text-color); border: none; border-radius: 8px; cursor: pointer;">取消</button>
+      </div>
+      <p id="tokenError" style="color: #dc3545; font-size: 13px; margin-top: 12px; display: none;"></p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeTokenModal();
+  });
+}
+
+function closeTokenModal() {
+  const modal = document.getElementById('tokenModal');
+  if (modal) modal.remove();
+}
+
+async function saveGithubToken() {
+  const token = document.getElementById('tokenInput').value.trim();
+  if (!token) {
+    showTokenError('请输入 Token');
+    return;
+  }
+
+  // 验证 Token 是否有效
+  showLoading('正在验证 Token...');
+  try {
+    const testResult = await githubApi('GET', '/user');
+    setGithubToken(token);
+    hideLoading();
+    closeTokenModal();
+    showToast('✅ Token 配置成功！');
+    
+    // 重新加载数据
+    clearCache();
+    await refreshAllData();
+  } catch (e) {
+    hideLoading();
+    showTokenError('Token 无效: ' + e.message);
+  }
+}
+
+function showTokenError(msg) {
+  const errorEl = document.getElementById('tokenError');
+  if (errorEl) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+}
+
+// ========== 初始化工作台 ==========
+
+async function initWorkspace() {
   // 从URL参数获取板块类型
   const urlParams = new URLSearchParams(window.location.search);
   const preType = urlParams.get('type');
   if (preType && TYPE_CONFIG[preType]) {
     currentType = preType;
+  }
+
+  // 检查 GitHub Token
+  if (!checkGithubToken()) {
+    setTimeout(() => {
+      showTokenSetup();
+    }, 300);
   }
 
   // 初始化UI
@@ -101,12 +193,34 @@ function initWorkspace() {
   // 设置初始选中板块
   selectType(currentType);
 
-  // 更新计数
+  // 加载数据
+  await refreshAllData();
   updateCounts();
   loadManageList('all');
 }
 
-// 修改密码
+// 刷新所有数据
+async function refreshAllData() {
+  showLoading('正在加载数据...');
+  try {
+    const content = await fetchContentJson();
+    // 更新缓存
+    Object.keys(content).forEach(key => {
+      if (key !== 'lastUpdated') {
+        saveAllData(key, content[key]);
+      }
+    });
+    updateCounts();
+    loadManageList(getCurrentFilter());
+  } catch (e) {
+    console.error('加载数据失败:', e);
+    showToast('⚠️ 数据加载失败，请检查网络和 Token 配置');
+  }
+  hideLoading();
+}
+
+// ========== 修改密码 ==========
+
 function changePassword() {
   const oldPasswordInput = document.getElementById('oldPassword');
   const newPasswordInput = document.getElementById('newPassword');
@@ -115,7 +229,6 @@ function changePassword() {
   const oldPassword = oldPasswordInput.value;
   const newPassword = newPasswordInput.value;
   
-  // 验证旧密码（如果输入了的话）
   if (oldPassword && oldPassword !== getCreatorPassword()) {
     statusEl.className = 'settings-status error';
     statusEl.textContent = '❌ 旧密码错误';
@@ -134,23 +247,19 @@ function changePassword() {
     return;
   }
   
-  // 保存新密码
   localStorage.setItem('creator_password', newPassword);
   
   statusEl.className = 'settings-status success';
   statusEl.textContent = '✅ 密码修改成功';
   
-  // 清空输入
   oldPasswordInput.value = '';
   newPasswordInput.value = '';
   
-  // 3秒后隐藏状态
   setTimeout(() => {
     statusEl.className = 'settings-status';
   }, 3000);
 }
 
-// 滚动到设置区域
 function scrollToSettings() {
   const settingsSection = document.getElementById('settingsSection');
   if (settingsSection) {
@@ -158,9 +267,8 @@ function scrollToSettings() {
   }
 }
 
-// ========== 原有代码 ==========
+// ========== 原有代码（部分保留）==========
 
-// 板块配置
 const TYPE_CONFIG = {
   lectures: { icon: '📖', name: '讲座', unit: '篇' },
   videos: { icon: '🎬', name: '视频', unit: '部' },
@@ -173,16 +281,10 @@ const TYPE_CONFIG = {
 
 const ALL_TYPES = Object.keys(TYPE_CONFIG);
 
-// 当前选中的板块
 let currentType = 'lectures';
-
-// 当前编辑的内容
 let editingItem = null;
-
-// 图片预览数据
 let imagePreviewData = [];
 
-// 初始化快捷卡片
 function initQuickCards() {
   const cards = document.querySelectorAll('.quick-card');
   cards.forEach(card => {
@@ -193,7 +295,6 @@ function initQuickCards() {
   });
 }
 
-// 初始化标签选择
 function initTagSelect() {
   const tags = document.querySelectorAll('.quick-tag');
   tags.forEach(tag => {
@@ -205,23 +306,19 @@ function initTagSelect() {
   });
 }
 
-// 初始化上传Tab切换
 function initUploadTabs() {
-  // 视频Tab
   document.querySelectorAll('#videoGroup .upload-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       switchUploadTab('video', tab.dataset.tab);
     });
   });
 
-  // 音频Tab
   document.querySelectorAll('#audioGroup .upload-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       switchUploadTab('audio', tab.dataset.tab);
     });
   });
 
-  // 图片Tab
   document.querySelectorAll('#imageGroup .upload-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       switchUploadTab('image', tab.dataset.tab);
@@ -229,7 +326,6 @@ function initUploadTabs() {
   });
 }
 
-// 切换上传Tab
 function switchUploadTab(type, tabName) {
   const group = document.getElementById(`${type}Group`);
   if (!group) return;
@@ -237,11 +333,9 @@ function switchUploadTab(type, tabName) {
   group.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
   group.querySelectorAll('.upload-panel').forEach(p => p.classList.remove('active'));
 
-  // 找到对应的tab和panel
   const targetTab = group.querySelector(`[data-tab="${tabName}"]`);
   if (targetTab) targetTab.classList.add('active');
 
-  // 根据tab类型找到对应panel
   let targetPanelId = '';
   if (type === 'video') {
     targetPanelId = tabName === 'videoEmbed' ? 'videoEmbed' : 'videoUpload';
@@ -255,31 +349,32 @@ function switchUploadTab(type, tabName) {
   if (targetPanel) targetPanel.classList.add('active');
 }
 
-// 初始化拖拽上传区域
 function initUploadAreas() {
-  // 视频
+  // 视频预览
   initDropZone('videoDropZone', 'videoFileInput', (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       document.getElementById('previewVideoPlayer').src = e.target.result;
       document.getElementById('videoPreview').style.display = 'block';
       document.getElementById('videoDropZone').style.display = 'none';
+      document.getElementById('videoFileName').textContent = file.name;
     };
     reader.readAsDataURL(file);
   });
 
-  // 音频
+  // 音频预览
   initDropZone('audioDropZone', 'audioFileInput', (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       document.getElementById('previewAudioPlayer').src = e.target.result;
       document.getElementById('audioPreview').style.display = 'block';
       document.getElementById('audioDropZone').style.display = 'none';
+      document.getElementById('audioFileName').textContent = file.name;
     };
     reader.readAsDataURL(file);
   });
 
-  // 图片
+  // 图片预览
   initDropZone('imageDropZone', 'imageFileInput', (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -311,6 +406,7 @@ function initUploadAreas() {
         document.getElementById('previewVideoPlayer').src = ev.target.result;
         document.getElementById('videoPreview').style.display = 'block';
         document.getElementById('videoDropZone').style.display = 'none';
+        document.getElementById('videoFileName').textContent = file.name;
       };
       reader.readAsDataURL(file);
     }
@@ -324,6 +420,7 @@ function initUploadAreas() {
         document.getElementById('previewAudioPlayer').src = ev.target.result;
         document.getElementById('audioPreview').style.display = 'block';
         document.getElementById('audioDropZone').style.display = 'none';
+        document.getElementById('audioFileName').textContent = file.name;
       };
       reader.readAsDataURL(file);
     }
@@ -341,7 +438,6 @@ function initUploadAreas() {
   });
 }
 
-// 初始化拖拽区域
 function initDropZone(dropZoneId, inputId, onFile) {
   const dropZone = document.getElementById(dropZoneId);
   if (!dropZone) return;
@@ -365,7 +461,6 @@ function initDropZone(dropZoneId, inputId, onFile) {
   });
 }
 
-// 渲染图片预览
 function renderImagePreviews() {
   const grid = document.getElementById('imagePreviewGrid');
   if (!grid) return;
@@ -383,13 +478,11 @@ function renderImagePreviews() {
   `).join('');
 }
 
-// 移除图片
 function removeImage(index) {
   imagePreviewData.splice(index, 1);
   renderImagePreviews();
 }
 
-// 清空视频
 function clearVideoFile() {
   document.getElementById('videoFileInput').value = '';
   document.getElementById('videoPreview').style.display = 'none';
@@ -397,7 +490,6 @@ function clearVideoFile() {
   document.getElementById('videoDropZone').style.display = 'block';
 }
 
-// 清空音频
 function clearAudioFile() {
   document.getElementById('audioFileInput').value = '';
   document.getElementById('audioPreview').style.display = 'none';
@@ -405,88 +497,80 @@ function clearAudioFile() {
   document.getElementById('audioDropZone').style.display = 'block';
 }
 
-// 初始化表单
 function initForm() {
   const form = document.getElementById('publishForm');
   if (!form) return;
 
-  // 设置默认日期
-  const date = new Date().toISOString().split('T')[0];
-
-  // 内容区域粘贴图片
   const contentArea = document.getElementById('inputContent');
   if (contentArea) {
-    contentArea.addEventListener('paste', (e) => {
+    contentArea.addEventListener('paste', async (e) => {
       const items = e.clipboardData.items;
       for (let item of items) {
         if (item.type.indexOf('image') !== -1) {
           e.preventDefault();
           const file = item.getAsFile();
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const imgTag = `<img src="${ev.target.result}" alt="粘贴图片" style="max-width:100%;">`;
+          
+          // 检查是否有 GitHub Token
+          if (!checkGithubToken()) {
+            showToast('⚠️ 请先配置 GitHub Token 才能上传图片');
+            return;
+          }
+          
+          try {
+            const url = await uploadInlineImage(file);
+            const imgTag = `<img src="${url}" alt="粘贴图片" style="max-width:100%;">`;
             const start = contentArea.selectionStart;
             const end = contentArea.selectionEnd;
             const text = contentArea.value;
             contentArea.value = text.substring(0, start) + imgTag + text.substring(end);
-          };
-          reader.readAsDataURL(file);
+          } catch (err) {
+            showToast('❌ 图片上传失败');
+            console.error(err);
+          }
           break;
         }
       }
     });
   }
 
-  // 表单提交
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     submitForm();
   });
 }
 
-// 选中板块
 function selectType(type) {
   if (!TYPE_CONFIG[type]) return;
 
   currentType = type;
 
-  // 更新卡片状态
   document.querySelectorAll('.quick-card').forEach(card => {
     card.classList.toggle('active', card.dataset.type === type);
   });
 
-  // 更新发布区标题
   document.getElementById('currentTypeIcon').textContent = TYPE_CONFIG[type].icon;
   document.getElementById('currentTypeName').textContent = `发布${TYPE_CONFIG[type].name}`;
 
-  // 显示/隐藏板块特有字段
   document.getElementById('videoGroup').style.display = type === 'videos' ? 'block' : 'none';
   document.getElementById('audioGroup').style.display = type === 'audios' ? 'block' : 'none';
   document.getElementById('imageGroup').style.display = type === 'images' ? 'block' : 'none';
   document.getElementById('downloadGroup').style.display = type === 'downloads' ? 'block' : 'none';
 
-  // 重置表单
   resetForm();
-
-  // 滚动到发布区
   document.getElementById('publishSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-// 重置表单
 function resetForm() {
   const form = document.getElementById('publishForm');
   if (form) form.reset();
 
-  // 重置标签
   document.querySelectorAll('.quick-tag').forEach(t => t.classList.remove('selected'));
 
-  // 重置上传区
   clearVideoFile();
   clearAudioFile();
   imagePreviewData = [];
   renderImagePreviews();
 
-  // 重置Tab
   ['video', 'audio', 'image'].forEach(type => {
     const group = document.getElementById(`${type}Group`);
     if (group) {
@@ -498,115 +582,163 @@ function resetForm() {
       });
     }
   });
+
+  editingItem = null;
+  document.getElementById('editId').value = '';
+  document.getElementById('submitBtn').textContent = '发布';
 }
 
-// 提交表单
+// ========== 核心发布逻辑（使用 GitHub API）==========
+
 async function submitForm() {
+  // 检查 Token
+  if (!checkGithubToken()) {
+    showToast('⚠️ 请先配置 GitHub Token');
+    showTokenSetup();
+    return;
+  }
+
   const title = document.getElementById('inputTitle').value.trim();
   const content = document.getElementById('inputContent').value.trim();
   const category = document.getElementById('inputCategory').value.trim();
   const summary = document.getElementById('inputSummary').value.trim();
 
   if (!title || !content) {
-    alert('请填写标题和内容');
+    showToast('❌ 请填写标题和内容');
     return;
   }
 
-  // 获取板块特有数据
-  let videoUrl = '';
-  let audioUrl = '';
-  let imageUrl = '';
-  let downloadUrl = '';
+  showLoading('正在处理...');
 
-  if (currentType === 'videos') {
-    const activePanel = document.querySelector('#videoGroup .upload-panel.active');
-    if (activePanel.id === 'videoEmbed') {
-      videoUrl = document.getElementById('inputVideoUrl').value.trim();
-    } else {
-      // 本地视频 - 从预览播放器获取
-      videoUrl = document.getElementById('previewVideoPlayer').src;
-      if (videoUrl && videoUrl.startsWith('blob:')) {
-        // 需要转换为base64
-        videoUrl = await fileToBase64FromSrc('video');
+  try {
+    let videoUrl = '';
+    let audioUrl = '';
+    let imageUrl = '';
+    let downloadUrl = '';
+
+    // 处理视频
+    if (currentType === 'videos') {
+      const activePanel = document.querySelector('#videoGroup .upload-panel.active');
+      if (activePanel.id === 'videoEmbed') {
+        videoUrl = document.getElementById('inputVideoUrl').value.trim();
+      } else {
+        // 本地视频文件 - 需要上传到 GitHub
+        const videoInput = document.getElementById('videoFileInput');
+        if (videoInput.files[0]) {
+          const file = videoInput.files[0];
+          
+          // 检查文件大小（GitHub API 限制 100MB）
+          if (file.size > 100 * 1024 * 1024) {
+            hideLoading();
+            showToast('❌ 视频文件不能超过 100MB');
+            return;
+          }
+          
+          videoUrl = await uploadMedia(file, 'media/videos');
+        }
       }
     }
-  }
 
-  if (currentType === 'audios') {
-    const activePanel = document.querySelector('#audioGroup .upload-panel.active');
-    if (activePanel.id === 'audioEmbed') {
-      audioUrl = document.getElementById('inputAudioUrl').value.trim();
-    } else {
-      audioUrl = document.getElementById('previewAudioPlayer').src;
-      if (audioUrl && audioUrl.startsWith('blob:')) {
-        audioUrl = await fileToBase64FromSrc('audio');
+    // 处理音频
+    if (currentType === 'audios') {
+      const activePanel = document.querySelector('#audioGroup .upload-panel.active');
+      if (activePanel.id === 'audioEmbed') {
+        audioUrl = document.getElementById('inputAudioUrl').value.trim();
+      } else {
+        const audioInput = document.getElementById('audioFileInput');
+        if (audioInput.files[0]) {
+          const file = audioInput.files[0];
+          if (file.size > 100 * 1024 * 1024) {
+            hideLoading();
+            showToast('❌ 音频文件不能超过 100MB');
+            return;
+          }
+          audioUrl = await uploadMedia(file, 'media/audios');
+        }
       }
     }
-  }
 
-  if (currentType === 'images') {
-    const activePanel = document.querySelector('#imageGroup .upload-panel.active');
-    if (activePanel.id === 'imageEmbed') {
-      imageUrl = document.getElementById('inputImageUrl').value.trim();
-    } else if (imagePreviewData.length > 0) {
-      // 多图合并为一个HTML
-      imageUrl = imagePreviewData.map(src => `<img src="${src}" alt="" style="max-width:100%;margin:8px 0;">`).join('');
+    // 处理图片
+    if (currentType === 'images') {
+      const activePanel = document.querySelector('#imageGroup .upload-panel.active');
+      if (activePanel.id === 'imageEmbed') {
+        imageUrl = document.getElementById('inputImageUrl').value.trim();
+      } else if (imagePreviewData.length > 0) {
+        // 多图上传
+        const urls = [];
+        for (let i = 0; i < imagePreviewData.length; i++) {
+          showLoading(`正在上传图片 ${i + 1}/${imagePreviewData.length}...`);
+          // 从 data URL 提取文件
+          const base64 = imagePreviewData[i];
+          const response = await fetch(base64);
+          const blob = await response.blob();
+          const file = new File([blob], `image_${i}.jpg`, { type: blob.type });
+          const url = await uploadMedia(file, 'media/images');
+          urls.push(url);
+        }
+        // 多图用特殊格式存储
+        imageUrl = urls.join('|||');
+      }
     }
-  }
 
-  if (currentType === 'downloads') {
-    downloadUrl = document.getElementById('inputDownloadUrl').value.trim();
-  }
+    // 处理下载
+    if (currentType === 'downloads') {
+      downloadUrl = document.getElementById('inputDownloadUrl').value.trim();
+    }
 
-  const item = {
-    title,
-    date: new Date().toISOString().split('T')[0],
-    category,
-    summary,
-    content,
-    videoUrl,
-    audioUrl,
-    imageUrl,
-    downloadUrl
-  };
+    const item = {
+      title,
+      date: new Date().toISOString().split('T')[0],
+      category,
+      summary,
+      content,
+      videoUrl,
+      audioUrl,
+      imageUrl,
+      downloadUrl
+    };
 
-  if (addItem(currentType, item)) {
-    alert(`${TYPE_CONFIG[currentType].name}发布成功！`);
+    // 获取当前内容
+    const contentJson = await fetchContentJson();
+    
+    // 判断是新增还是编辑
+    const editId = document.getElementById('editId').value;
+    if (editId) {
+      // 编辑现有项
+      item.id = editId;
+      const index = contentJson[currentType].findIndex(i => i.id === editId);
+      if (index !== -1) {
+        contentJson[currentType][index] = item;
+      }
+    } else {
+      // 新增
+      item.id = currentType + '_' + Date.now();
+      contentJson[currentType].unshift(item);
+    }
+    
+    // 更新时间戳
+    contentJson.lastUpdated = new Date().toISOString();
+
+    // 保存到 GitHub
+    const action = editId ? '更新' : '发布';
+    await updateContentJson(contentJson, `${action}${TYPE_CONFIG[currentType].name}: ${title}`);
+
+    hideLoading();
+    showToast(`✅ ${TYPE_CONFIG[currentType].name}${action}成功！`);
+    
     resetForm();
     updateCounts();
     loadManageList(getCurrentFilter());
-  } else {
-    alert('发布失败，请重试');
+    
+  } catch (e) {
+    hideLoading();
+    console.error('发布失败:', e);
+    showToast('❌ 发布失败: ' + e.message);
   }
 }
 
-// 从blob src转换为base64
-function fileToBase64FromSrc(type) {
-  return new Promise((resolve) => {
-    const player = document.getElementById(type === 'video' ? 'previewVideoPlayer' : 'previewAudioPlayer');
-    // 使用canvas来获取数据
-    fetch(player.src)
-      .then(res => res.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
-      })
-      .catch(() => resolve(''));
-  });
-}
+// ========== 管理功能 ==========
 
-// 文件转Base64
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// 更新所有计数
 function updateCounts() {
   let total = 0;
 
@@ -615,20 +747,17 @@ function updateCounts() {
     const count = data.length;
     total += count;
 
-    // 更新卡片计数
     const countEl = document.getElementById(`count-${type}`);
     if (countEl) {
       countEl.textContent = `${count} ${TYPE_CONFIG[type].unit}`;
     }
 
-    // 更新管理tab计数
     const tabCountEl = document.getElementById(`tab-count-${type}`);
     if (tabCountEl) {
       tabCountEl.textContent = count;
     }
   });
 
-  // 更新全部计数
   const allCountEl = document.getElementById('count-all');
   if (allCountEl) {
     allCountEl.textContent = total;
@@ -639,7 +768,6 @@ function updateCounts() {
   }
 }
 
-// 初始化管理Tab
 function initManageTabs() {
   const tabs = document.querySelectorAll('.manage-tab');
   tabs.forEach(tab => {
@@ -651,13 +779,11 @@ function initManageTabs() {
   });
 }
 
-// 获取当前筛选类型
 function getCurrentFilter() {
   const activeTab = document.querySelector('.manage-tab.active');
   return activeTab ? activeTab.dataset.type : 'all';
 }
 
-// 加载管理列表
 function loadManageList(filterType) {
   const container = document.getElementById('manageList');
   if (!container) return;
@@ -665,14 +791,12 @@ function loadManageList(filterType) {
   let items = [];
 
   if (filterType === 'all') {
-    // 收集所有类型的数据
     ALL_TYPES.forEach(type => {
       const data = getAllData(type);
       data.forEach(item => {
         items.push({ ...item, _type: type });
       });
     });
-    // 按日期排序
     items.sort((a, b) => new Date(b.date) - new Date(a.date));
   } else {
     const data = getAllData(filterType);
@@ -709,38 +833,41 @@ function loadManageList(filterType) {
   `).join('');
 }
 
-// 编辑内容
-function editItem(type, id) {
+async function editItem(type, id) {
   const item = getItemById(type, id);
   if (!item) {
-    alert('内容不存在');
+    showToast('内容不存在');
     return;
   }
 
   editingItem = { type, id };
 
-  // 填充表单
   document.getElementById('editId').value = id;
-  document.getElementById('editType').value = type;
-  document.getElementById('editTitle').value = item.title;
-  document.getElementById('editCategory').value = item.category || '';
-  document.getElementById('editContent').value = item.content || '';
-  document.getElementById('editSummary').value = item.summary || '';
-  document.getElementById('editDate').value = item.date || '';
-
-  // 显示弹窗
-  document.getElementById('editModal').classList.add('show');
+  document.getElementById('inputTitle').value = item.title;
+  document.getElementById('inputCategory').value = item.category || '';
+  document.getElementById('inputContent').value = item.content || '';
+  document.getElementById('inputSummary').value = item.summary || '';
+  
+  // 切换到对应板块
+  selectType(type);
+  
+  // 滚动到发布区
+  document.getElementById('publishSection').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('submitBtn').textContent = '更新';
+  
+  showToast('📝 已加载内容，修改后点击"更新"保存');
 }
 
-// 关闭编辑弹窗
 function closeEditModal() {
   document.getElementById('editModal').classList.remove('show');
   editingItem = null;
 }
 
-// 提交编辑
-function submitEdit() {
-  if (!editingItem) return;
+async function submitEdit() {
+  if (!editingItem) {
+    showToast('请先选择要编辑的内容');
+    return;
+  }
 
   const updates = {
     title: document.getElementById('editTitle').value.trim(),
@@ -751,40 +878,77 @@ function submitEdit() {
   };
 
   if (!updates.title || !updates.content) {
-    alert('请填写标题和内容');
+    showToast('请填写标题和内容');
     return;
   }
 
-  if (updateItem(editingItem.type, editingItem.id, updates)) {
-    alert('更新成功！');
-    closeEditModal();
-    updateCounts();
-    loadManageList(getCurrentFilter());
-  } else {
-    alert('更新失败，请重试');
+  showLoading('正在更新...');
+  
+  try {
+    const contentJson = await fetchContentJson();
+    const index = contentJson[editingItem.type].findIndex(i => i.id === editingItem.id);
+    
+    if (index !== -1) {
+      updates.id = editingItem.id;
+      contentJson[editingItem.type][index] = { 
+        ...contentJson[editingItem.type][index],
+        ...updates
+      };
+      contentJson.lastUpdated = new Date().toISOString();
+      
+      await updateContentJson(contentJson, `更新${TYPE_CONFIG[editingItem.type].name}: ${updates.title}`);
+      
+      hideLoading();
+      showToast('✅ 更新成功！');
+      closeEditModal();
+      updateCounts();
+      loadManageList(getCurrentFilter());
+    }
+  } catch (e) {
+    hideLoading();
+    showToast('❌ 更新失败: ' + e.message);
   }
 }
 
-// 删除确认
-function deleteItemConfirm(type, id) {
+async function deleteItemConfirm(type, id) {
   if (!confirm('确定要删除这条内容吗？')) return;
 
-  if (deleteItem(type, id)) {
+  if (!checkGithubToken()) {
+    showToast('⚠️ 请先配置 GitHub Token');
+    return;
+  }
+
+  showLoading('正在删除...');
+  
+  try {
+    const contentJson = await fetchContentJson();
+    const item = contentJson[type].find(i => i.id === id);
+    const title = item ? item.title : '未知';
+    
+    contentJson[type] = contentJson[type].filter(i => i.id !== id);
+    contentJson.lastUpdated = new Date().toISOString();
+    
+    await updateContentJson(contentJson, `删除${TYPE_CONFIG[type].name}: ${title}`);
+    
+    hideLoading();
+    showToast('✅ 删除成功');
     updateCounts();
     loadManageList(getCurrentFilter());
-  } else {
-    alert('删除失败，请重试');
+  } catch (e) {
+    hideLoading();
+    showToast('❌ 删除失败: ' + e.message);
   }
 }
 
-// 预览内容
+// ========== 预览功能 ==========
+
 function previewContent() {
   const title = document.getElementById('inputTitle').value.trim();
   const content = document.getElementById('inputContent').value.trim();
   const category = document.getElementById('inputCategory').value.trim();
 
   if (!title || !content) {
-    alert('请先填写标题和内容');
+    showToast('请先填写标题和内容');
     return;
   }
 
@@ -796,7 +960,6 @@ function previewContent() {
     category || '未分类'
   ].join(' · ');
 
-  // 处理内容中的图片
   let processedContent = content;
   if (currentType === 'images' && imagePreviewData.length > 0) {
     processedContent = imagePreviewData.map(src => 
@@ -808,12 +971,10 @@ function previewContent() {
   document.getElementById('previewModal').classList.add('show');
 }
 
-// 关闭预览弹窗
 function closePreviewModal() {
   document.getElementById('previewModal').classList.remove('show');
 }
 
-// HTML转义
 function escapeHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
@@ -821,9 +982,9 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// 初始化侧边栏操作
+// ========== 辅助功能 ==========
+
 function initSidebarActions() {
-  // 编辑表单提交
   const editForm = document.getElementById('editForm');
   if (editForm) {
     editForm.addEventListener('submit', (e) => {
@@ -832,7 +993,6 @@ function initSidebarActions() {
     });
   }
 
-  // 点击背景关闭弹窗
   document.getElementById('editModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'editModal') {
       closeEditModal();
@@ -845,21 +1005,50 @@ function initSidebarActions() {
     }
   });
 
-  // ESC关闭弹窗
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeEditModal();
       closePreviewModal();
+      closeTokenModal();
     }
   });
 }
 
-// 滚动到发布区
 function scrollToPublish() {
   document.getElementById('publishSection')?.scrollIntoView({ behavior: 'smooth' });
 }
 
-// 滚动到管理区
 function scrollToManage() {
   document.getElementById('manageSection')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Toast 提示
+function showToast(message) {
+  let toast = document.getElementById('toast-message');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-message';
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 99999;
+      text-align: center;
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.display = 'block';
+  
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3000);
 }

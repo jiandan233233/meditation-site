@@ -26,36 +26,28 @@
 
   <!-- 主内容 -->
   <main class="main-content">
-    <!-- 板块标题横幅 -->
-    <div class="page-banner">
-    </div>
-
+    <div class="page-banner"></div>
     <div class="container">
-      <!-- 说明文字 -->
       <p class="section-desc">欣赏精美的冥想相关图片，包括圣地风景、姿势图解、曼陀罗图案等。</p>
 
-      <!-- 搜索框 -->
       <div class="search-box">
         <input type="text" class="search-input" id="searchInput" placeholder="搜索图片标题或关键词...">
         <button class="search-btn" onclick="performSearch('images')">搜索</button>
       </div>
 
-      <!-- 分类筛选 -->
       <div class="filter-bar">
         <div class="filter-tags" id="filterTags"></div>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 暗黑模式</button>
       </div>
 
-      <!-- 图片网格 -->
-      <div class="image-grid" id="imageGrid"></div>
-
-      <!-- 分页 -->
+      <div id="loadingState" style="text-align:center;padding:40px;color:var(--text-muted);">⏳ 正在加载...</div>
+      <div class="image-grid" id="imageGrid" style="display:none;"></div>
       <div class="pagination" id="pagination"></div>
     </div>
   </main>
 
   <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
-    © 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;" title="">✎</a>
+    © 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;">✎</a>
   </footer>
 
   <script src="js/data.js"></script>
@@ -69,75 +61,61 @@
       initPage();
     });
 
-    function initPage() {
-      const data = getAllData('images');
-      filteredData = data;
-      
-      // 渲染分类标签
-      const categories = getCategories('images');
-      renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
-      
-      // 渲染列表
-      renderPage(1);
-      
-      // 搜索功能
+    async function initPage() {
+      try {
+        const content = await fetchContentJson();
+        const data = content.images || [];
+        saveAllData('images', data);
+        filteredData = data;
+        
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('imageGrid').style.display = 'grid';
+        
+        const categories = getCategories('images');
+        renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
+        renderPage(1);
+      } catch (e) {
+        document.getElementById('loadingState').innerHTML = '⚠️ 加载失败';
+      }
+
       document.getElementById('searchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          performSearch('images');
-        }
+        if (e.key === 'Enter') performSearch('images');
       });
     }
 
     function filterByCategory(category) {
-      if (!category) {
-        filteredData = getAllData('images');
-      } else {
-        filteredData = getAllData('images').filter(item => item.category === category);
-      }
+      filteredData = category ? getAllData('images').filter(item => item.category === category) : getAllData('images');
       renderPage(1);
     }
 
     function performSearch(type) {
-      const keyword = document.getElementById('searchInput').value.trim();
-      filteredData = searchData(type, keyword);
+      filteredData = searchData(type, document.getElementById('searchInput').value.trim());
       renderPage(1);
     }
 
     function renderPage(page) {
       currentPage = page;
       const start = (page - 1) * PAGE_SIZE;
-      const end = start + PAGE_SIZE;
-      const pageData = filteredData.slice(start, end);
-      
-      const container = document.getElementById('imageGrid');
-      if (pageData.length === 0) {
-        container.innerHTML = '<div class="empty-state">暂无图片</div>';
-      } else {
-        renderImageGrid(pageData, container);
-      }
-      
+      const pageData = filteredData.slice(start, start + PAGE_SIZE);
+      renderImageGrid(pageData, document.getElementById('imageGrid'));
       renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);
     }
 
-    // 渲染图片网格
     function renderImageGrid(items, container) {
-      if (!container) return;
-      
       if (!items || items.length === 0) {
         container.innerHTML = '<div class="empty-state">暂无图片</div>';
         return;
       }
-
       container.innerHTML = items.map(item => `
         <div class="image-card" onclick="goToDetail('${item.id}', 'images')">
           <div class="image-thumb">
-            ${item.imageUrl 
-              ? `<img src="${item.imageUrl}" alt="${item.title}" onerror="this.parentElement.innerHTML='🖼️'">` 
+            ${item.imageUrl && !item.imageUrl.includes('|||')
+              ? `<img src="${item.imageUrl}" alt="${item.title}" onerror="this.parentElement.innerHTML='🖼️'">`
               : '🖼️'}
           </div>
           <div class="image-info">
-            <div class="image-info-title">${item.title}</div>
-            <div class="image-info-date">${item.date}</div>
+            <div class="image-title">${item.title}</div>
+            <div class="image-meta">${item.category || ''} · ${item.date}</div>
           </div>
         </div>
       `).join('');
@@ -145,13 +123,8 @@
 
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
-      if (current === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      document.documentElement[current === 'dark' ? 'removeAttribute' : 'setAttribute']('data-theme', 'dark');
+      localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
     }
   </script>
 </body>

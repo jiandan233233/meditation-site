@@ -24,7 +24,12 @@
     </div>
   </nav>
 
-  <main class="detail-container">
+  <!-- 加载状态 -->
+  <div id="loadingState" style="text-align:center;padding:100px 20px;color:var(--text-muted);">
+    ⏳ 正在加载内容...
+  </div>
+
+  <main class="detail-container" id="detailContainer" style="display:none;">
     <!-- 面包屑 -->
     <div class="breadcrumb" id="breadcrumb">
       <a href="index.html">首页</a> &gt; <span id="breadcrumb-category">加载中...</span>
@@ -72,6 +77,320 @@
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/detail.js"></script>
+  <script>
+    /**
+     * 详情页脚本 - 从 GitHub 加载内容
+     */
+
+    (function() {
+      'use strict';
+
+      let currentId = '';
+      let currentType = '';
+      let currentItem = null;
+
+      const TYPE_NAMES = {
+        lectures: '讲座',
+        videos: '视频',
+        audios: '音频',
+        images: '图片',
+        literature: '经典文献',
+        activities: '活动分享',
+        downloads: '下载资料'
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        initDetail();
+        initCommentForm();
+      });
+
+      async function initDetail() {
+        const params = new URLSearchParams(window.location.search);
+        currentId = params.get('id');
+        currentType = params.get('type');
+
+        if (!currentId || !currentType) {
+          showError('参数错误，请从列表页进入');
+          return;
+        }
+
+        await loadContent();
+      }
+
+      async function loadContent() {
+        try {
+          const content = await fetchContentJson();
+          const data = content[currentType] || [];
+          currentItem = data.find(item => item.id === currentId);
+
+          if (!currentItem) {
+            showError('内容不存在');
+            return;
+          }
+
+          // 保存到本地缓存
+          saveAllData(currentType, data);
+
+          // 隐藏加载状态，显示内容
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('detailContainer').style.display = 'block';
+
+          renderDetail();
+          renderComments();
+        } catch (e) {
+          console.error('加载失败:', e);
+          showError('加载失败，请刷新重试');
+        }
+      }
+
+      function showError(msg) {
+        document.getElementById('loadingState').innerHTML = '⚠️ ' + msg;
+      }
+
+      function renderDetail() {
+        document.title = currentItem.title + ' - Sahaja Yoga';
+
+        const breadcrumbCategory = document.getElementById('breadcrumb-category');
+        if (breadcrumbCategory) {
+          breadcrumbCategory.textContent = TYPE_NAMES[currentType] || currentType;
+        }
+
+        const titleEl = document.getElementById('detail-title');
+        if (titleEl) {
+          titleEl.textContent = currentItem.title;
+        }
+
+        const dateEl = document.getElementById('detail-date');
+        if (dateEl) {
+          dateEl.textContent = currentItem.date || '';
+        }
+
+        const categoryEl = document.getElementById('detail-category');
+        if (categoryEl && currentItem.category) {
+          categoryEl.textContent = currentItem.category;
+          categoryEl.style.display = 'inline-block';
+        } else if (categoryEl) {
+          categoryEl.style.display = 'none';
+        }
+
+        // 媒体区
+        const videoSection = document.getElementById('detail-video');
+        const videoWrapper = document.getElementById('video-wrapper');
+        
+        if (videoSection && videoWrapper) {
+          videoSection.style.display = 'block';
+          videoWrapper.innerHTML = '';
+          
+          if (currentItem.videoUrl) {
+            videoWrapper.innerHTML = getVideoEmbed(currentItem.videoUrl);
+          }
+          else if (currentItem.audioUrl) {
+            videoWrapper.innerHTML = `
+              <div class="audio-player-detail">
+                <div style="padding:20px;background:var(--bg-light);border-radius:8px;text-align:center;">
+                  <div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">🔊 ${currentItem.title}</div>
+                  ${getAudioEmbed(currentItem.audioUrl)}
+                </div>
+              </div>
+            `;
+          }
+          else if (currentItem.imageUrl) {
+            videoWrapper.innerHTML = `
+              <div class="image-viewer">
+                ${getImageEmbed(currentItem.imageUrl)}
+              </div>
+            `;
+          }
+          else {
+            videoSection.style.display = 'none';
+          }
+        }
+
+        const contentEl = document.getElementById('detail-content');
+        if (contentEl) {
+          contentEl.innerHTML = currentItem.content || '<p>暂无详细内容</p>';
+        }
+      }
+
+      function getVideoEmbed(url) {
+        if (!url) return '';
+
+        // GitHub Pages 视频（直接 URL）
+        if (url.includes('/media/videos/')) {
+          return `<video src="${url}" controls style="width:100%;border-radius:8px;"></video>`;
+        }
+
+        // Base64视频
+        if (url.startsWith('data:video/')) {
+          return `<video src="${url}" controls style="width:100%;border-radius:8px;"></video>`;
+        }
+
+        // B站视频
+        if (url.includes('bilibili.com') || url.match(/^BV[\w]+$/)) {
+          const bvid = url.match(/^BV[\w]+$/) ? url : extractBilibiliId(url);
+          if (bvid) {
+            return `<iframe src="//player.bilibili.com/player.html?bvid=${bvid}&autoplay=0" 
+                    allowfullscreen="allowfullscreen" 
+                    webkitallowfullscreen="webkitallowfullscreen" 
+                    mozallowfullscreen="mozallowfullscreen">
+                    </iframe>`;
+          }
+        }
+
+        // YouTube
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+          const ytid = extractYouTubeId(url);
+          if (ytid) {
+            return `<iframe src="//www.youtube.com/embed/${ytid}?autoplay=0" 
+                    allowfullscreen="allowfullscreen" 
+                    webkitallowfullscreen="webkitallowfullscreen" 
+                    mozallowfullscreen="mozallowfullscreen">
+                    </iframe>`;
+          }
+        }
+
+        // HTML5视频
+        if (url.match(/\.(mp4|webm|ogg)(\?.*)?$/i) || url.includes('.mp4') || url.includes('.webm') || url.startsWith('blob:')) {
+          return `<video src="${url}" controls style="width:100%;border-radius:8px;"></video>`;
+        }
+
+        if (url.includes('<iframe')) {
+          return url;
+        }
+
+        return `<iframe src="${url}" allowfullscreen></iframe>`;
+      }
+
+      function getAudioEmbed(url) {
+        if (!url) return '';
+        
+        if (url.startsWith('data:audio/')) {
+          return `<audio src="${url}" controls style="width:100%;margin-top:12px;"></audio>`;
+        }
+        
+        // GitHub Pages 音频
+        if (url.includes('/media/audios/')) {
+          return `<audio src="${url}" controls style="width:100%;margin-top:12px;"></audio>`;
+        }
+        
+        return `<audio src="${url}" controls style="width:100%;margin-top:12px;"></audio>`;
+      }
+
+      function getImageEmbed(url) {
+        if (!url) return '';
+        
+        // 多图（用 ||| 分隔）
+        if (url.includes('|||')) {
+          const urls = url.split('|||');
+          return urls.map(u => `<img src="${u}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`).join('');
+        }
+        
+        if (url.startsWith('data:image/')) {
+          return `<img src="${url}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`;
+        }
+
+        // GitHub Pages 图片
+        if (url.includes('/media/images/')) {
+          return `<img src="${url}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`;
+        }
+        
+        return `<img src="${url}" alt="图片" style="max-width:100%;border-radius:8px;margin:16px 0;">`;
+      }
+
+      function extractBilibiliId(url) {
+        const match = url.match(/BV[\w]+/);
+        return match ? match[0] : null;
+      }
+
+      function extractYouTubeId(url) {
+        const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+        return match ? match[1] : null;
+      }
+
+      // 评论功能
+      function initCommentForm() {
+        const submitBtn = document.getElementById('comment-submit');
+        if (submitBtn) {
+          submitBtn.addEventListener('click', submitComment);
+        }
+      }
+
+      function submitComment() {
+        const nickname = document.getElementById('comment-nickname').value.trim();
+        const text = document.getElementById('comment-text').value.trim();
+
+        if (!nickname || !text) {
+          alert('请填写昵称和留言内容');
+          return;
+        }
+
+        const comment = {
+          nickname,
+          text
+        };
+
+        addComment(currentId, comment);
+        
+        document.getElementById('comment-text').value = '';
+        renderComments();
+        alert('留言成功！');
+      }
+
+      function renderComments() {
+        const container = document.getElementById('comment-list');
+        if (!container) return;
+
+        const comments = getComments(currentId);
+
+        if (comments.length === 0) {
+          container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">暂无留言，来发表第一条留言吧！</div>';
+          return;
+        }
+
+        container.innerHTML = comments.map(c => `
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-nickname">${escapeHtml(c.nickname)}</span>
+              <span class="comment-date">${formatDate(c.date)}</span>
+            </div>
+            <div class="comment-body">${escapeHtml(c.text)}</div>
+          </div>
+        `).join('');
+      }
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('zh-CN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+
+      // 分享功能
+      function openSharePanel(title, url) {
+        if (navigator.share) {
+          navigator.share({
+            title: title,
+            url: url
+          }).catch(console.error);
+        } else {
+          navigator.clipboard.writeText(url).then(() => {
+            alert('链接已复制到剪贴板');
+          }).catch(() => {
+            prompt('复制链接:', url);
+          });
+        }
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -1163,6 +1163,33 @@
     <!-- 设置区域 -->
     <section class="settings-section" id="settingsSection">
       <h2 class="settings-title">⚙️ 工作台设置</h2>
+      
+      <!-- GitHub Token 配置 -->
+      <div style="background: var(--bg-light); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <h3 style="font-size: 15px; margin: 0 0 12px 0; color: var(--text-color);">🔑 GitHub API 配置</h3>
+        <div class="settings-row">
+          <span class="settings-label">Token状态：</span>
+          <span style="color: var(--text-muted); font-size: 14px;" id="githubTokenStatus">⏳ 检测中...</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">仓库：</span>
+          <span style="color: var(--text-muted); font-size: 14px;">jiandan233233/sahaja-yoga</span>
+        </div>
+        <div class="settings-row">
+          <button type="button" class="settings-btn" onclick="showTokenSetup()" id="tokenSetupBtn">
+            🔧 配置 GitHub Token
+          </button>
+          <button type="button" class="settings-btn" style="background: #dc3545;" onclick="clearCache(); alert('缓存已清除');" id="clearCacheBtn">
+            🗑️ 清除本地缓存
+          </button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+          💡 需要 GitHub Personal Access Token 才能保存内容到仓库。Token 仅存储在浏览器本地。
+        </p>
+      </div>
+      
+      <!-- 密码修改 -->
+      <h3 style="font-size: 15px; margin: 0 0 16px 0; color: var(--text-color);">🔐 访问密码</h3>
       <div class="settings-row">
         <span class="settings-label">当前密码：</span>
         <span style="color:var(--text-muted);font-size:14px;" id="currentPasswordStatus">已设置</span>
@@ -1174,7 +1201,7 @@
       <div class="settings-row">
         <span class="settings-label">新密码：</span>
         <input type="password" class="settings-input" id="newPassword" placeholder="输入新密码">
-        <button class="settings-btn" onclick="changePassword()">修改密码</button>
+        <button type="button" class="settings-btn" onclick="changePassword()">修改密码</button>
       </div>
       <div class="settings-row">
         <span class="settings-status" id="passwordStatus"></span>
@@ -1450,5 +1477,37 @@
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
+  <script>
+    // 检测 GitHub Token 状态
+    function updateTokenStatus() {
+      const statusEl = document.getElementById('githubTokenStatus');
+      if (!statusEl) return;
+      
+      const token = getGithubToken();
+      if (token) {
+        statusEl.textContent = '✅ 已配置';
+        statusEl.style.color = '#2E7D32';
+        document.getElementById('tokenSetupBtn').textContent = '✏️ 修改 Token';
+      } else {
+        statusEl.textContent = '❌ 未配置';
+        statusEl.style.color = '#dc3545';
+      }
+    }
+    
+    // 页面加载后检测
+    document.addEventListener('DOMContentLoaded', function() {
+      // 延迟检测，确保 admin.js 已加载
+      setTimeout(updateTokenStatus, 100);
+    });
+    
+    // 监听 Token 变化
+    const originalSetGithubToken = window.setGithubToken;
+    if (!originalSetGithubToken) {
+      window.setGithubToken = function(token) {
+        localStorage.setItem('github_token', token);
+        updateTokenStatus();
+      };
+    }
+  </script>
 </body>
 </html>

@@ -15,6 +15,8 @@
       <a href="index.html" class="nav-item">首页</a>
       <a href="lectures.html" class="nav-item active">讲座</a>
       <a href="videos.html" class="nav-item">视频</a>
+      <a href="audios.html" class="nav-item">音频</a>
+      <a href="images.html" class="nav-item">图片</a>
       <a href="literature.html" class="nav-item">经典文献</a>
       <a href="activities.html" class="nav-item">活动分享</a>
       <a href="downloads.html" class="nav-item">下载资料</a>
@@ -24,36 +26,28 @@
 
   <!-- 主内容 -->
   <main class="main-content">
-    <!-- 板块标题横幅 -->
-    <div class="page-banner">
-    </div>
-
+    <div class="page-banner"></div>
     <div class="container">
-      <!-- 说明文字 -->
       <p class="section-desc">聆听导师开示，深入了解冥想与正念的智慧。</p>
 
-      <!-- 搜索框 -->
       <div class="search-box">
         <input type="text" class="search-input" id="searchInput" placeholder="搜索讲座标题或关键词...">
         <button class="search-btn" onclick="performSearch('lectures')">搜索</button>
       </div>
 
-      <!-- 分类筛选 -->
       <div class="filter-bar">
         <div class="filter-tags" id="filterTags"></div>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 暗黑模式</button>
       </div>
 
-      <!-- 内容列表 -->
-      <div class="content-list" id="contentList"></div>
-
-      <!-- 分页 -->
+      <div id="loadingState" style="text-align:center;padding:40px;color:var(--text-muted);">⏳ 正在加载...</div>
+      <div class="content-list" id="contentList" style="display:none;"></div>
       <div class="pagination" id="pagination"></div>
     </div>
   </main>
 
   <footer style="text-align:center;padding:24px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border-color);">
-    © 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;" title="">✎</a>
+    © 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;">✎</a>
   </footer>
 
   <script src="js/data.js"></script>
@@ -67,65 +61,50 @@
       initPage();
     });
 
-    function initPage() {
-      const data = getAllData('lectures');
-      filteredData = data;
-      
-      // 渲染分类标签
-      const categories = getCategories('lectures');
-      renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
-      
-      // 渲染列表
-      renderPage(1);
-      
-      // 搜索功能
+    async function initPage() {
+      try {
+        const content = await fetchContentJson();
+        const data = content.lectures || [];
+        saveAllData('lectures', data);
+        filteredData = data;
+        
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('contentList').style.display = 'block';
+        
+        const categories = getCategories('lectures');
+        renderFilterTags(categories, document.getElementById('filterTags'), filterByCategory);
+        renderPage(1);
+      } catch (e) {
+        document.getElementById('loadingState').innerHTML = '⚠️ 加载失败';
+      }
+
       document.getElementById('searchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          performSearch('lectures');
-        }
+        if (e.key === 'Enter') performSearch('lectures');
       });
     }
 
     function filterByCategory(category) {
-      if (!category) {
-        filteredData = getAllData('lectures');
-      } else {
-        filteredData = getAllData('lectures').filter(item => item.category === category);
-      }
+      filteredData = category ? getAllData('lectures').filter(item => item.category === category) : getAllData('lectures');
       renderPage(1);
     }
 
     function performSearch(type) {
-      const keyword = document.getElementById('searchInput').value.trim();
-      filteredData = searchData(type, keyword);
+      filteredData = searchData(type, document.getElementById('searchInput').value.trim());
       renderPage(1);
     }
 
     function renderPage(page) {
       currentPage = page;
       const start = (page - 1) * PAGE_SIZE;
-      const end = start + PAGE_SIZE;
-      const pageData = filteredData.slice(start, end);
-      
-      const container = document.getElementById('contentList');
-      if (pageData.length === 0) {
-        container.innerHTML = '<div class="empty-state">暂无内容</div>';
-      } else {
-        renderContentList(pageData, container, true, 'lectures');
-      }
-      
+      const pageData = filteredData.slice(start, start + PAGE_SIZE);
+      renderContentList(pageData, document.getElementById('contentList'), true, 'lectures');
       renderPagination(filteredData.length, page, PAGE_SIZE, document.getElementById('pagination'), renderPage);
     }
 
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
-      if (current === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      document.documentElement[current === 'dark' ? 'removeAttribute' : 'setAttribute']('data-theme', 'dark');
+      localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
     }
   </script>
 </body>

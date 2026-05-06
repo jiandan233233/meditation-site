@@ -1,8 +1,26 @@
 /**
- * 数据管理模块 - localStorage CRUD操作
+ * 数据管理模块 - GitHub API + localStorage 混合存储
  */
 
-// 存储键名
+// ========== 配置 ==========
+const CONFIG = {
+  // GitHub 仓库信息
+  GITHUB_REPO: 'jiandan233233/sahaja-yoga',
+  GITHUB_BRANCH: 'main',
+  // GitHub Pages URL（用于读取公开内容）
+  GITHUB_PAGES_URL: 'https://jiandan233233.github.io/sahaja-yoga',
+  // GitHub API 端点
+  GITHUB_API_URL: 'https://api.github.com',
+  // localStorage keys
+  TOKEN_KEY: 'github_token',
+  CACHE_KEY: 'site_data_cache',
+  CACHE_EXPIRY_KEY: 'site_data_cache_expiry',
+  CACHE_EXPIRY_MS: 5 * 60 * 1000, // 缓存5分钟
+  // 评论存储
+  COMMENTS_KEY: 'site_comments'
+};
+
+// 存储键名（保持向后兼容）
 const STORAGE_KEYS = {
   lectures: 'site_lectures',
   videos: 'site_videos',
@@ -24,237 +42,247 @@ const DEFAULT_DATA = {
       category: '冥想入门系列',
       summary: '学习如何创造一个适合冥想的内心环境，理解入静的关键要素。',
       content: '<p>冥想的入门第一步，是学会如何让自己平静下来。很多人以为冥想是要"什么都不想"，但这其实是一个常见的误解。</p><p>入静的首要条件是：接受。接受此刻的你，无论思绪多么纷乱，无论身体多么疲惫。接受是放松的开始，而放松是冥想的基础。</p><h3>几个入静的小技巧：</h3><ul><li>找一个安静的空间</li><li>保持舒适的坐姿</li><li>闭上眼睛，自然呼吸</li><li>不要评判自己的思绪</li></ul><p>当你能够接受自己本来的样子时，宁静自然会到来。</p>'
-    },
-    {
-      id: 'lecture_2',
-      title: '正念与觉知',
-      date: '2026-04-28',
-      category: '冥想进阶',
-      summary: '深入探讨正念的概念，培养持续觉知的能力。',
-      content: '<p>正念（Mindfulness）是一种有意识地对当下身心体验的觉知。它不是一种技巧，而是一种生活态度。</p><h3>正念的核心要素：</h3><ul><li><strong>专注</strong>：将注意力集中在当下的一个对象上</li><li><strong>觉知</strong>：知道自己正在做什么、想什么、感受什么</li><li><strong>接纳</strong>：不对当下体验做评判，只是如实地观察</li></ul><p>当我们在日常生活中培养正念时，每一个普通的瞬间都可以成为冥想的练习。</p>'
-    },
-    {
-      id: 'lecture_3',
-      title: '内在宁静之道',
-      date: '2026-04-20',
-      category: '冥想入门系列',
-      summary: '探索内心平静的来源，学会在喧嚣中保持宁静。',
-      content: '<p>真正的宁静不是来自外在环境的安静，而是来自内心的平和。</p><p>无论外界如何嘈杂，我们都可以在内心找到一片宁静之地。这需要练习，需要耐心，需要一颗愿意向内探索的心。</p><h3>通往内在宁静的路径：</h3><p>1. 呼吸是桥梁 - 通过呼吸连接身心<br>2. 觉知是钥匙 - 觉察而不反应<br>3. 接纳是终点 - 完全接纳当下的一切</p><p>让我们一起踏上这段内在探索的旅程。</p>'
-    },
-    {
-      id: 'lecture_4',
-      title: '呼吸与意识的联系',
-      date: '2026-04-15',
-      category: '冥想进阶',
-      summary: '了解呼吸如何影响我们的意识状态，掌握呼吸调节法。',
-      content: '<p>呼吸是唯一能够同时被自主和不自主控制的生理过程。这使得呼吸成为连接意识与潜意识的桥梁。</p><h3>呼吸与情绪的关系：</h3><ul><li>紧张焦虑时，呼吸变得浅而快</li><li>平静放松时，呼吸变得深而缓</li><li>有意识地调节呼吸，可以反过来影响情绪状态</li></ul><h3>腹式呼吸法：</h3><p>吸气时让腹部鼓起，呼气时让腹部回落。这是最自然、最放松的呼吸方式。</p>'
-    },
-    {
-      id: 'lecture_5',
-      title: '如何在日常生活中保持冥想状态',
-      date: '2026-04-10',
-      category: '生活实践',
-      summary: '将冥想融入日常生活，在忙碌中保持觉知与平静。',
-      content: '<p>冥想不仅是坐垫上的练习，更是一种生活方式。当我们将正念带入日常生活的每一个瞬间，冥想就成为了一种持续的状态。</p><h3>日常冥想练习：</h3><ul><li><strong>吃饭时</strong>：细细品味每一口食物的味道和质地</li><li><strong>走路时</strong>：感受脚步与地面的接触</li><li><strong>等待时</strong>：把它当作观察呼吸的机会</li><li><strong>工作时</strong>：全神贯注于手头的任务</li></ul><p>生活中的每一个片刻，都可以成为觉醒的时刻。</p>'
     }
   ],
-  videos: [
-    {
-      id: 'video_1',
-      title: '清晨冥想引导 10分钟',
-      date: '2026-05-03',
-      category: '冥想引导',
-      summary: '用10分钟开启美好的一天，清新的引导带你进入平静的状态。',
-      content: '<p>欢迎来到清晨冥想。这是一段10分钟的冥想引导，帮助你以平静的心态开始新的一天。</p><h3>准备：</h3><p>找一个舒适的位置坐下，背部挺直但放松。轻轻闭上眼睛。</p><h3>呼吸：</h3><p>用鼻子缓缓吸气，默数4秒。屏住呼吸，默数2秒。用嘴巴缓缓呼气，默数6秒。重复这个节奏。</p><p>现在，让你的意识扫描全身，从脚趾开始，慢慢向上，感受每一个部位的放松。</p>',
-      videoUrl: 'BV1BJ411B7u5'
-    },
-    {
-      id: 'video_2',
-      title: '焦虑缓解冥想练习',
-      date: '2026-04-25',
-      category: '专题冥想',
-      summary: '专门针对焦虑情绪的冥想练习，帮助释放紧张与不安。',
-      content: '<p>当你感到焦虑时，这个冥想练习可以帮助你找回内心的平静。</p><h3>焦虑的本质：</h3><p>焦虑通常来自于对未来的担忧。冥想教会我们：回到当下，此刻才是我们真正拥有的。</p><h3>练习步骤：</h3><ol><li>承认焦虑的存在，不要抗拒它</li><li>把注意力带到呼吸上</li><li>感受身体中焦虑的位置</li><li>用呼气带走那些紧绷感</li></ol><p>这个练习可以在任何时候进行，当你感到焦虑升起时，给自己几分钟时间。</p>',
-      videoUrl: 'BV1WW411b7sF'
-    },
-    {
-      id: 'video_3',
-      title: '深度放松身体扫描',
-      date: '2026-04-18',
-      category: '冥想引导',
-      summary: '从头到脚的全身扫描，帮助释放身体每一处的紧绷。',
-      content: '<p>身体扫描是一种强有力的放松技巧，通过有意识地关注身体各部位，培养对身体的觉知。</p><h3>练习方法：</h3><p>躺下或坐在舒适的位置。开始从头顶扫描，将注意力带到头皮、前额、眼睛、脸颊......依次向下，直到脚趾。</p><p>在每个部位停留几秒，感受那里的感觉。不需要刻意改变什么，只是观察。如果某个部位感到紧绷，温柔地将呼吸带到那里。</p><p>完成全身扫描后，静躺片刻，感受整体的放松状态。</p>',
-      videoUrl: ''
-    },
-    {
-      id: 'video_4',
-      title: '睡前冥想 安然入眠',
-      date: '2026-04-12',
-      category: '专题冥想',
-      summary: '帮助放下一天的疲惫，引导你进入宁静的睡眠。',
-      content: '<p>这个睡前冥想旨在帮助你释放一天的疲惫，为睡眠做好准备。</p><h3>准备入睡：</h3><p>躺在床上，闭上眼睛。进行一次长长的深呼吸，释放白天的一切。</p><p>想象自己站在一个宁静的地方——也许是一片安静的森林，或是一片平静的湖泊。感受那里的安宁，让它包围着你。</p><p>当思绪飘来时，不要执着，只是轻轻地把注意力带回到那个宁静的画面。</p><p>慢慢放松身体的每一个部位，从头到脚，让入睡自然发生。</p>',
-      videoUrl: ''
-    },
-    {
-      id: 'video_5',
-      title: '正念呼吸法演示',
-      date: '2026-04-05',
-      category: '冥想引导',
-      summary: '详细演示正念呼吸法的具体操作步骤。',
-      content: '<p>正念呼吸是所有冥想的基础。让我们详细学习这个核心技巧。</p><h3>正确的坐姿：</h3><ul><li>坐在椅子或垫子上</li><li>双脚平放在地面</li><li>背部挺直但放松</li><li>双手自然放在膝盖上</li><li>肩膀放松，下巴微微内收</li></ul><h3>呼吸观察：</h3><p>不需要控制呼吸，只是观察它。注意呼吸的节奏、深度、气息进出身体的感觉。最好把注意力放在鼻尖或腹部。</p><p>当注意力游移时（它一定会），温柔地承认这一点，然后把注意力带回到呼吸上。这不是失败，这是练习的本质。</p>',
-      videoUrl: ''
-    }
-  ],
-  literature: [
-    {
-      id: 'lit_1',
-      title: '冥想经典：《瑜伽经》选读',
-      date: '2026-05-02',
-      category: '经典解读',
-      summary: '解读帕坦伽利的《瑜伽经》，探索冥想的古老智慧。',
-      content: '<p>《瑜伽经》是印度古典瑜伽哲学的奠基之作，由帕坦伽利在公元2世纪左右编撰。这部经典提出了瑜伽修行的八支（八阶法），为冥想实践提供了系统的理论框架。</p><h3>第一章 禅定品（Samadhi Pada）选读：</h3><blockquote>1.1 现在开始教授瑜伽。<br>1.2 瑜伽是控制心的波动。<br>1.3 当心平静了，修行者便能见到事物的本来面目。</blockquote><h3>核心概念：</h3><ul><li><strong>Citta（心）：</strong>包括 mind（思想）、intellect（智性）和 ego（自我）</li><li><strong>Vrittis（心的波动）：</strong>心的各种活动状态</li><li><strong>Abhyasa（持续练习）：</strong>稳定的日常练习</li><li><strong>Vairagya（不执着）：</strong>对结果的放下</li></ul><p>这些两千多年前的智慧，至今仍指引着无数冥想修行者。</p>'
-    },
-    {
-      id: 'lit_2',
-      title: '正念的起源与发展',
-      date: '2026-04-22',
-      category: '学术研究',
-      summary: '追溯正念从东方禅修到西方心理学的演变历程。',
-      content: '<p>正念（Mindfulness）作为一个现代概念，是东西方智慧交融的产物。</p><h3>起源：</h3><p>正念源于佛教禅修中的" sati "（巴利语）和" smṛti "（梵语），意为"念"、"记忆"或"觉知"。在佛教传统中，正念是八正道之一，是通往解脱的关键修行。</p><h3>西方引入：</h3><ul><li>19世纪末：印度佛教传入西方</li><li>1960-70年代：佛教导师如一行禅师、佛使比丘等到西方弘法</li><li>1979年：乔·卡巴金（Jon Kabat-Zinn）在麻省理工学院创立正念减压课程（MBSR）</li></ul><h3>现代发展：</h3><p>如今，正念已被科学方法验证，成为治疗焦虑、抑郁、压力等问题的主流疗法之一。它从宗教实践中分离出来，成为一种普世的身心健康工具。</p>'
-    },
-    {
-      id: 'lit_3',
-      title: '冥想与脑科学研究',
-      date: '2026-04-15',
-      category: '学术研究',
-      summary: '现代神经科学如何解释冥想对大脑的影响。',
-      content: '<p>过去二十年间，大脑成像技术的进步使科学家能够直接观察冥想状态下的大脑变化。</p><h3>主要研究发现：</h3><ul><li><strong>前额叶皮层增厚：</strong>与注意力和自我调节相关的大脑区域在长期冥想者中更发达</li><li><strong>杏仁核缩小：</strong>这个与压力反应相关的区域在冥想者中体积减小</li><li><strong>默认模式网络（DMN）变化：</strong>冥想者"走神"时的大脑活动模式有所不同</li></ul><h3>短期效应：</h3><p>即使是初次冥想者，也能在一次30分钟的冥想后观察到大脑活动模式的变化。</p><h3>长期效应：</h3><p>长期冥想者的大脑显示出更高效的注意力网络和更强的情绪调节能力。</p><p>这些研究为冥想的益处提供了客观的神经生物学证据。</p>'
-    },
-    {
-      id: 'lit_4',
-      title: '古老冥想传统概览',
-      date: '2026-04-08',
-      category: '经典解读',
-      summary: '介绍世界各地古老的冥想传统与修行方法。',
-      content: '<p>冥想并非单一传统的产物。世界各地的文化都发展出了各自的冥想和内观方法。</p><h3>主要冥想传统：</h3><ul><li><strong>印度传统：</strong>包括吠陀冥想、瑜伽、禅那（Dhyana）等</li><li><strong>佛教传统：</strong>南传的四念处、藏传的金刚乘、禅宗的禅</li><li><strong>中国道家：</strong>内丹、坐忘、守静等</li><li><strong>苏菲派：</strong>旋转舞、念诵真主之名</li><li><strong>基督教：</strong>寂静主义、耶稣祷告</li></ul><h3>共同点：</h3><p>尽管方法各异，这些传统都有一些共同要素：专注、觉察、超越自我、追求开悟或觉醒。它们都认识到，通过训练心灵，人类可以触及更深层的意识状态。</p>'
-    },
-    {
-      id: 'lit_5',
-      title: '冥想在现代医学中的应用',
-      date: '2026-03-30',
-      category: '学术研究',
-      summary: '冥想作为辅助疗法在医学领域的应用与研究进展。',
-      content: '<p>冥想作为一种辅助疗法，已被广泛纳入现代医疗体系。</p><h3>临床应用领域：</h3><ul><li><strong>疼痛管理：</strong>帮助慢性疼痛患者改变对疼痛的感知和反应</li><li><strong>心理健康：</strong>治疗焦虑症、抑郁症、创伤后应激障碍（PTSD）</li><li><strong>心血管健康：</strong>降低血压，改善心脏健康</li><li><strong>免疫功能：</strong>增强免疫反应</li><li><strong>癌症支持：</strong>减轻治疗副作用，提高生活质量</li></ul><h3>循证医学证据：</h3><p>美国国立卫生研究院（NIH）等权威机构已认可冥想对多种健康问题的益处。多项随机对照试验和元分析研究支持其临床有效性。</p><h3>注意事项：</h3><p>冥想不能替代必要的医疗治疗，但可以作为一种安全有效的补充疗法。</p>'
-    }
-  ],
-  activities: [
-    {
-      id: 'activity_1',
-      title: '北京周末冥想共修活动',
-      date: '2026-05-10',
-      category: '北京',
-      summary: '每周六下午的常规冥想共修，欢迎初学者参加。',
-      content: '<p><strong>时间：</strong>每周六 14:00-16:00</p><p><strong>地点：</strong>北京市朝阳区某静谧空间（报名后通知具体地址）</p><p><strong>内容：</strong></p><ul><li>静坐冥想引导（60分钟）</li><li>茶歇交流（20分钟）</li><li>正念行走练习（40分钟）</li></ul><p><strong>费用：</strong>免费（随喜乐捐）</p><p><strong>报名方式：</strong>无需报名，直接前往。</p><p><strong>注意事项：</strong></p><ul><li>请穿着宽松舒适的衣物</li><li>活动期间保持安静</li><li>手机请调至静音</li></ul>'
-    },
-    {
-      id: 'activity_2',
-      title: '上海正念冥想分享会',
-      date: '2026-05-05',
-      category: '上海',
-      summary: '主题为"正念与情绪管理"的分享与体验活动。',
-      content: '<p><strong>时间：</strong>2026年5月5日（周日）10:00-12:00</p><p><strong>地点：</strong>上海市静安区某文化空间</p><p><strong>活动流程：</strong></p><ol><li>签到与静心（30分钟）</li><li>正念讲座：情绪与觉知（40分钟）</li><li>冥想体验练习（30分钟）</li><li>自由交流与问答（20分钟）</li></ol><p><strong>适合人群：</strong></p><ul><li>对冥想感兴趣的初学者</li><li>希望学习情绪管理的朋友</li><li>有一定冥想经验希望交流的修行者</li></ul><p><strong>费用：</strong>38元（场地与茶点）</p>'
-    },
-    {
-      id: 'activity_3',
-      title: '线上冥想入门课程（免费）',
-      date: '2026-04-28',
-      category: '线上',
-      summary: '专为初学者设计的免费线上冥想系列课程，共8周。',
-      content: '<p><strong>形式：</strong>线上直播 + 录播回放</p><p><strong>时间：</strong>每周三晚 20:00-21:00</p><p><strong>课程大纲：</strong></p><ul><li>第1周：什么是冥想 —— 打破常见误解</li><li>第2周：呼吸的基础 —— 正确的呼吸方式</li><li>第3周：身体扫描 —— 与身体连接</li><li>第4周：专注练习 —— 培养注意力的艺术</li><li>第5周：开放觉知 —— 接纳的艺术</li><li>第6周：静默的力量 —— 超越念头</li><li>第7周：慈悲冥想 —— 爱与善意</li><li>第8周：整合与持续 —— 建立日常习惯</li></ul><p><strong>参与方式：</strong>关注公众号获取直播链接</p><p><strong>费用：</strong>完全免费</p>'
-    }
-  ],
-  downloads: [
-    {
-      id: 'download_1',
-      title: '冥想入门手册 PDF',
-      date: '2026-05-01',
-      category: '入门资料',
-      summary: '32页的冥想入门指南，包含基础理论与实用练习。',
-      content: '<p>本手册专为冥想初学者编写，内容涵盖：</p><ul><li>冥想的基本概念</li><li>正确的姿势与呼吸</li><li>常见问题与解答</li><li>每日练习指南</li><li>进阶学习路径</li></ul><p><strong>文件格式：</strong>PDF<br><strong>页数：</strong>32页<br><strong>语言：</strong>简体中文</p><p><strong>下载链接：</strong>请在内容详情页获取。</p>'
-    },
-    {
-      id: 'download_2',
-      title: '正念练习音频合集',
-      date: '2026-04-20',
-      category: '音频资料',
-      summary: '包含5段引导冥想音频，适合不同场景使用。',
-      content: '<p>音频合集包含以下内容：</p><ul><li>清晨唤醒冥想（8分钟）</li><li>减压放松冥想（15分钟）</li><li>睡前安眠冥想（20分钟）</li><li>专注力训练冥想（10分钟）</li><li>慈悲心培养冥想（12分钟）</li></ul><p><strong>音频格式：</strong>MP3<br><strong>总时长：</strong>约65分钟<br><strong>音质：</strong>128kbps</p><p><strong>下载链接：</strong>请在内容详情页获取。</p>'
-    },
-    {
-      id: 'download_3',
-      title: '冥想姿势参考图',
-      date: '2026-04-10',
-      category: '图文资料',
-      summary: '详细图解冥想常用姿势及要点提示。',
-      content: '<p>本资料详细图解冥想时常用的几种姿势：</p><ul><li><strong>莲花坐（Padmasana）</strong>：经典冥想姿势</li><li><strong>半莲花坐</strong>：适合初学者的变体</li><li><strong>跪坐</strong>：适合西方人的姿势</li><li><strong>椅子上坐</strong>：简单实用的选择</li><li><strong>仰卧</strong>：适合放松与入睡</li></ul><p>每种姿势都配有：</p><ul><li>标准示范图</li><li>身体各部位要点</li><li>常见错误纠正</li><li>适用场景说明</li></ul><p><strong>文件格式：</strong>PDF + 图片<br><strong>下载链接：</strong>请在内容详情页获取。</p>'
-    }
-  ],
-  audios: [
-    {
-      id: 'audio_1',
-      title: '晨间冥想引导 10分钟',
-      date: '2026-05-03',
-      category: '冥想引导',
-      summary: '清晨10分钟冥想引导音频',
-      content: '<p>用这段10分钟的引导音频开始你美好的一天。</p><p>这音频适合：</p><ul><li>早晨起床后</li><li>需要提神醒脑时</li><li>开始一天工作前</li></ul>'
-    },
-    {
-      id: 'audio_2',
-      title: '深度放松 - 身体扫描',
-      date: '2026-04-25',
-      category: '放松音频',
-      summary: '从头到脚的全身扫描放松引导',
-      content: '<p>这段身体扫描音频将帮助你从头到脚释放紧张。</p><p>适合：</p><ul><li>睡前放松</li><li>减压放松</li><li>缓解焦虑</li></ul>'
-    },
-    {
-      id: 'audio_3',
-      title: '自然白噪音 - 森林雨声',
-      date: '2026-04-15',
-      category: '环境音',
-      summary: '30分钟森林雨声，适合冥想和睡眠',
-      content: '<p>纯粹的自然雨声，帮助你放松和专注。</p><p>适合：</p><ul><li>冥想时作为背景音</li><li>助眠</li><li>专注工作</li></ul>'
-    }
-  ],
-  images: [
-    {
-      id: 'image_1',
-      title: '喜马拉雅山冥想圣地',
-      date: '2026-05-01',
-      category: '圣地巡礼',
-      summary: '印度喜马拉雅山区的冥想修行圣地',
-      content: '<p>位于印度北部的喜马拉雅山区，自古以来就是冥想修行者的圣地。</p><p>这里群山环绕，空气清新，是静心冥想的绝佳场所。</p>'
-    },
-    {
-      id: 'image_2',
-      title: '莲花坐姿参考',
-      date: '2026-04-20',
-      category: '姿势参考',
-      summary: '标准莲花坐姿势图解',
-      content: '<p>莲花坐（Padmasana）是最经典的冥想姿势。</p><p>这个姿势有助于打开髋关节，保持脊柱挺直，促进气的流动。</p>'
-    },
-    {
-      id: 'image_3',
-      title: '冥想曼陀罗图案',
-      date: '2026-04-10',
-      category: '冥想辅助',
-      summary: '用于专注和冥想的曼陀罗图案',
-      content: '<p>曼陀罗是冥想中常用的视觉聚焦工具。</p><p>凝视曼陀罗可以帮助集中注意力，进入更深层的意识状态。</p>'
-    }
-  ]
+  videos: [],
+  audios: [],
+  images: [],
+  literature: [],
+  activities: [],
+  downloads: []
 };
 
-// 初始化默认数据
+// ========== GitHub API 函数 ==========
+
+/**
+ * 获取 GitHub Token
+ */
+function getGithubToken() {
+  return localStorage.getItem(CONFIG.TOKEN_KEY) || '';
+}
+
+/**
+ * 设置 GitHub Token
+ */
+function setGithubToken(token) {
+  localStorage.setItem(CONFIG.TOKEN_KEY, token);
+}
+
+/**
+ * 通用 GitHub API 调用
+ */
+async function githubApi(method, path, body = null) {
+  const token = getGithubToken();
+  if (!token) {
+    throw new Error('GitHub Token 未配置，请在创作者工作台设置');
+  }
+
+  const options = {
+    method: method,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github+json'
+    }
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(`${CONFIG.GITHUB_API_URL}${path}`, options);
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `API 请求失败: ${response.status}`);
+  }
+
+  // DELETE 请求返回 204 No Content
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
+
+/**
+ * 获取文件 SHA（用于更新文件）
+ */
+async function getFileSha(path) {
+  try {
+    const data = await githubApi('GET', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`);
+    return data.sha;
+  } catch (e) {
+    // 文件不存在，返回 null
+    return null;
+  }
+}
+
+/**
+ * 从 GitHub Pages 获取 content.json（公开读取，不需要 token）
+ */
+async function fetchContentJson() {
+  const cache = getCache();
+  if (cache) {
+    return cache;
+  }
+
+  try {
+    const response = await fetch(`${CONFIG.GITHUB_PAGES_URL}/data/content.json`);
+    if (!response.ok) {
+      throw new Error('获取内容失败');
+    }
+    const data = await response.json();
+    setCache(data);
+    return data;
+  } catch (e) {
+    console.warn('无法从 GitHub Pages 获取内容，使用缓存或默认数据:', e);
+    const cachedData = getCache();
+    if (cachedData) {
+      return cachedData;
+    }
+    return DEFAULT_DATA;
+  }
+}
+
+/**
+ * 更新 content.json（需要 token）
+ */
+async function updateContentJson(data, message = '更新内容') {
+  showLoading('正在保存到 GitHub...');
+  
+  try {
+    const path = 'data/content.json';
+    const sha = await getFileSha(path);
+    
+    const content = JSON.stringify(data, null, 2);
+    const base64Content = btoa(unescape(encodeURIComponent(content)));
+    
+    const body = {
+      message: message,
+      content: base64Content,
+      branch: CONFIG.GITHUB_BRANCH
+    };
+    
+    if (sha) {
+      body.sha = sha;
+    }
+
+    await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
+    
+    // 更新本地缓存
+    setCache(data);
+    
+    hideLoading();
+    return true;
+  } catch (e) {
+    hideLoading();
+    throw e;
+  }
+}
+
+/**
+ * 上传媒体文件到仓库
+ */
+async function uploadMedia(file, directory) {
+  showLoading(`正在上传 ${file.name}...`);
+  
+  try {
+    // 生成文件名
+    const ext = file.name.split('.').pop();
+    const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+    const path = `${directory}/${filename}`;
+    
+    // 转换为 base64
+    const base64Content = await fileToBase64(file);
+    const base64Data = base64Content.split(',')[1];
+    
+    const body = {
+      message: `上传媒体文件: ${file.name}`,
+      content: base64Data,
+      branch: CONFIG.GITHUB_BRANCH
+    };
+
+    await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
+    
+    // 返回 GitHub Pages URL
+    const mediaUrl = `${CONFIG.GITHUB_PAGES_URL}/${directory}/${filename}`;
+    
+    hideLoading();
+    return mediaUrl;
+  } catch (e) {
+    hideLoading();
+    throw e;
+  }
+}
+
+/**
+ * 上传图片（内嵌在内容中的小图片）
+ */
+async function uploadInlineImage(file) {
+  showLoading(`正在上传图片 ${file.name}...`);
+  
+  try {
+    const ext = file.name.split('.').pop();
+    const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+    const path = `media/images/${filename}`;
+    
+    const base64Content = await fileToBase64(file);
+    const base64Data = base64Content.split(',')[1];
+    
+    const body = {
+      message: `上传图片: ${file.name}`,
+      content: base64Data,
+      branch: CONFIG.GITHUB_BRANCH
+    };
+
+    await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
+    
+    hideLoading();
+    return `${CONFIG.GITHUB_PAGES_URL}/${path}`;
+  } catch (e) {
+    hideLoading();
+    throw e;
+  }
+}
+
+// ========== 缓存函数 ==========
+
+function getCache() {
+  try {
+    const cached = localStorage.getItem(CONFIG.CACHE_KEY);
+    const expiry = localStorage.getItem(CONFIG.CACHE_EXPIRY_KEY);
+    
+    if (cached && expiry && Date.now() < parseInt(expiry)) {
+      return JSON.parse(cached);
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function setCache(data) {
+  try {
+    localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem(CONFIG.CACHE_EXPIRY_KEY, (Date.now() + CONFIG.CACHE_EXPIRY_MS).toString());
+  } catch (e) {
+    console.warn('缓存设置失败:', e);
+  }
+}
+
+function clearCache() {
+  localStorage.removeItem(CONFIG.CACHE_KEY);
+  localStorage.removeItem(CONFIG.CACHE_EXPIRY_KEY);
+}
+
+// ========== 数据操作函数（兼容新旧接口） ==========
+
+/**
+ * 初始化默认数据
+ */
 function initDefaultData() {
+  // 旧版 localStorage 初始化（保留以防万一）
   Object.keys(STORAGE_KEYS).forEach(key => {
     const storageKey = STORAGE_KEYS[key];
     const stored = localStorage.getItem(storageKey);
@@ -264,39 +292,53 @@ function initDefaultData() {
   });
 }
 
-// 获取所有数据
-function getAllData(type) {
-  const storageKey = STORAGE_KEYS[type];
-  if (!storageKey) return [];
+/**
+ * 获取所有数据（从 GitHub 或缓存）
+ */
+async function getAllDataAsync(type) {
   try {
-    const data = localStorage.getItem(storageKey);
-    return data ? JSON.parse(data) : [];
+    const content = await fetchContentJson();
+    return content[type] || [];
   } catch (e) {
-    console.error('Error reading data:', e);
+    console.error('获取数据失败:', e);
     return [];
   }
 }
 
-// 保存所有数据
-function saveAllData(type, data) {
-  const storageKey = STORAGE_KEYS[type];
-  if (!storageKey) return false;
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(data));
-    return true;
-  } catch (e) {
-    console.error('Error saving data:', e);
-    return false;
+/**
+ * 同步获取所有数据（使用缓存）
+ */
+function getAllData(type) {
+  const cache = getCache();
+  if (cache && cache[type]) {
+    return cache[type];
   }
+  // 如果没有缓存，返回空数组，页面会通过异步加载
+  return [];
 }
 
-// 获取单条数据
+/**
+ * 保存所有数据
+ */
+function saveAllData(type, data) {
+  // 同时更新缓存
+  const cache = getCache() || {};
+  cache[type] = data;
+  setCache(cache);
+  return true;
+}
+
+/**
+ * 获取单条数据
+ */
 function getItemById(type, id) {
   const data = getAllData(type);
   return data.find(item => item.id === id) || null;
 }
 
-// 添加数据
+/**
+ * 添加数据（仅更新本地缓存和 localStorage）
+ */
 function addItem(type, item) {
   const data = getAllData(type);
   item.id = type + '_' + Date.now();
@@ -304,7 +346,9 @@ function addItem(type, item) {
   return saveAllData(type, data);
 }
 
-// 更新数据
+/**
+ * 更新数据（仅更新本地）
+ */
 function updateItem(type, id, updates) {
   const data = getAllData(type);
   const index = data.findIndex(item => item.id === id);
@@ -313,14 +357,18 @@ function updateItem(type, id, updates) {
   return saveAllData(type, data);
 }
 
-// 删除数据
+/**
+ * 删除数据（仅更新本地）
+ */
 function deleteItem(type, id) {
   const data = getAllData(type);
   const filtered = data.filter(item => item.id !== id);
   return saveAllData(type, filtered);
 }
 
-// 搜索数据
+/**
+ * 搜索数据
+ */
 function searchData(type, keyword) {
   const data = getAllData(type);
   if (!keyword) return data;
@@ -332,21 +380,24 @@ function searchData(type, keyword) {
   );
 }
 
-// 获取所有分类
+/**
+ * 获取所有分类
+ */
 function getCategories(type) {
   const data = getAllData(type);
   const categories = [...new Set(data.map(item => item.category).filter(Boolean))];
   return categories;
 }
 
-// 评论相关
+// ========== 评论相关 ==========
+
 function getComments(contentId) {
-  const allComments = JSON.parse(localStorage.getItem(STORAGE_KEYS.comments) || '{}');
+  const allComments = JSON.parse(localStorage.getItem(CONFIG.COMMENTS_KEY) || '{}');
   return allComments[contentId] || [];
 }
 
 function addComment(contentId, comment) {
-  const allComments = JSON.parse(localStorage.getItem(STORAGE_KEYS.comments) || '{}');
+  const allComments = JSON.parse(localStorage.getItem(CONFIG.COMMENTS_KEY) || '{}');
   if (!allComments[contentId]) {
     allComments[contentId] = [];
   }
@@ -355,15 +406,64 @@ function addComment(contentId, comment) {
     ...comment,
     date: new Date().toISOString()
   });
-  localStorage.setItem(STORAGE_KEYS.comments, JSON.stringify(allComments));
+  localStorage.setItem(CONFIG.COMMENTS_KEY, JSON.stringify(allComments));
 }
 
-// 重置数据到默认值
-function resetToDefaults() {
-  Object.keys(STORAGE_KEYS).forEach(key => {
-    localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(DEFAULT_DATA[key] || []));
+// ========== UI 辅助函数 ==========
+
+function showLoading(message = '加载中...') {
+  let loadingEl = document.getElementById('global-loading');
+  if (!loadingEl) {
+    loadingEl = document.createElement('div');
+    loadingEl.id = 'global-loading';
+    loadingEl.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    `;
+    document.body.appendChild(loadingEl);
+  }
+  loadingEl.innerHTML = `
+    <div style="background: white; padding: 24px 40px; border-radius: 12px; text-align: center; color: #333;">
+      <div style="margin-bottom: 12px;">⏳</div>
+      <div id="loading-text">${message}</div>
+      <div style="margin-top: 12px; font-size: 12px; color: #666;">请稍候...</div>
+    </div>
+  `;
+  loadingEl.style.display = 'flex';
+}
+
+function hideLoading() {
+  const loadingEl = document.getElementById('global-loading');
+  if (loadingEl) {
+    loadingEl.style.display = 'none';
+  }
+}
+
+// ========== 工具函数 ==========
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
-// 初始化
+// ========== 初始化 ==========
 initDefaultData();
+
+// 页面加载时预取数据
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    fetchContentJson().catch(console.warn);
+  });
+}

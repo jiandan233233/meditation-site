@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- 导航栏 -->
   <nav class="navbar">
     <a href="index.html" class="navbar-brand">SAHAJA YOGA</a>
     <button class="menu-toggle">☰</button>
@@ -25,24 +24,20 @@
   </nav>
 
   <main class="main-content">
-    <!-- 搜索横幅 -->
     <div class="page-banner">
       <h1>🔍 搜索</h1>
     </div>
 
     <div class="container">
-      <!-- 搜索框 -->
       <div class="search-box">
         <input type="text" class="search-input" id="searchInput" placeholder="输入关键词搜索...">
         <button class="search-btn" onclick="performSearch()">搜索</button>
       </div>
 
-      <!-- 搜索结果 -->
       <div class="search-results" id="searchResults">
-        <p class="search-hint">输入关键词开始搜索...</p>
+        <p class="search-hint">⏳ 正在加载数据...</p>
       </div>
 
-      <!-- 热门标签 -->
       <div class="hot-tags">
         <h3 class="hot-tags-title">热门标签</h3>
         <div class="filter-tags">
@@ -60,13 +55,12 @@
   </main>
 
   <footer>
-    <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;" title="">✎</a></p>
+    <p class="footer-text">© 2026 Sahaja Yoga · Free Meditation Resources <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:11px;opacity:0.2;margin-left:4px;">✎</a></p>
   </footer>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
   <script>
-    // 类型名称映射
     const TYPE_NAMES = {
       lectures: '讲座',
       videos: '视频',
@@ -77,7 +71,6 @@
       downloads: '下载资料'
     };
 
-    // 类型颜色
     const TYPE_COLORS = {
       lectures: '#FF8C42',
       videos: '#4CAF50',
@@ -88,25 +81,40 @@
       downloads: '#795548'
     };
 
-    // 页面初始化
-    document.addEventListener('DOMContentLoaded', function() {
-      const params = new URLSearchParams(window.location.search);
-      const query = params.get('q');
-      
-      if (query) {
-        document.getElementById('searchInput').value = query;
-        performSearch(query);
+    let allContent = {};
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // 先加载所有数据
+      try {
+        const content = await fetchContentJson();
+        allContent = content;
+        
+        // 保存到本地缓存
+        Object.keys(content).forEach(key => {
+          if (key !== 'lastUpdated' && content[key]) {
+            saveAllData(key, content[key]);
+          }
+        });
+        
+        // 处理 URL 参数
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get('q');
+        
+        if (query) {
+          document.getElementById('searchInput').value = query;
+          performSearch(query);
+        } else {
+          document.getElementById('searchResults').innerHTML = '<p class="search-hint">输入关键词开始搜索...</p>';
+        }
+      } catch (e) {
+        document.getElementById('searchResults').innerHTML = '<p class="search-hint">⚠️ 数据加载失败，请刷新重试</p>';
       }
 
-      // 回车搜索
       document.getElementById('searchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          performSearch();
-        }
+        if (e.key === 'Enter') performSearch();
       });
     });
 
-    // 执行搜索
     function performSearch(keyword) {
       keyword = keyword || document.getElementById('searchInput').value.trim();
       if (!keyword) {
@@ -118,9 +126,8 @@
       const types = ['lectures', 'videos', 'audios', 'images', 'literature', 'activities', 'downloads'];
       
       types.forEach(type => {
-        const data = getAllData(type);
+        const data = allContent[type] || [];
         data.forEach(item => {
-          // 匹配标题、摘要、内容、分类
           const matchTitle = item.title && item.title.toLowerCase().includes(keyword.toLowerCase());
           const matchSummary = item.summary && item.summary.toLowerCase().includes(keyword.toLowerCase());
           const matchCategory = item.category && item.category.toLowerCase().includes(keyword.toLowerCase());
@@ -136,20 +143,15 @@
         });
       });
 
-      // 更新URL
       window.history.replaceState({}, '', '?q=' + encodeURIComponent(keyword));
-
-      // 渲染结果
       renderResults(results, keyword);
     }
 
-    // 按标签搜索
     function searchByTag(tag) {
       document.getElementById('searchInput').value = tag;
       performSearch(tag);
     }
 
-    // 渲染搜索结果
     function renderResults(results, keyword) {
       const container = document.getElementById('searchResults');
       
@@ -189,10 +191,8 @@
       container.innerHTML = html;
     }
 
-    // 获取摘要
     function getExcerpt(item, keyword) {
       const text = item.summary || item.content || '';
-      // 移除HTML标签
       const plainText = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       
       const lowerText = plainText.toLowerCase();
@@ -213,26 +213,22 @@
       return highlightKeyword(excerpt, keyword);
     }
 
-    // 高亮关键词
     function highlightKeyword(text, keyword) {
       if (!keyword) return text;
       const regex = new RegExp('(' + escapeRegex(keyword) + ')', 'gi');
       return text.replace(regex, '<mark>$1</mark>');
     }
 
-    // 转义正则特殊字符
     function escapeRegex(str) {
       return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // HTML转义
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
     }
 
-    // 跳转到详情页
     function goToDetail(id, type) {
       window.location.href = `detail.html?id=${id}&type=${type}`;
     }
@@ -240,11 +236,11 @@
   <style>
     .search-hint {
       text-align: center;
-      color: #999;
+      color: var(--text-muted);
       padding: 40px 20px;
     }
     .search-count {
-      color: #666;
+      color: var(--text-muted);
       font-size: 14px;
       margin-bottom: 16px;
     }
@@ -254,66 +250,44 @@
       gap: 12px;
     }
     .search-item {
-      background: var(--bg-light);
-      border-radius: 8px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       padding: 16px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
     }
     .search-item:hover {
-      background: var(--border-color);
+      border-color: var(--primary-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .search-type {
       display: inline-block;
-      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
       color: white;
-      padding: 3px 8px;
-      border-radius: 3px;
+      font-size: 12px;
       margin-bottom: 8px;
     }
     .search-title {
+      margin: 0 0 8px 0;
       font-size: 16px;
-      font-weight: 600;
       color: var(--text-color);
-      margin-bottom: 6px;
-    }
-    .search-title mark {
-      background: #FFF3CD;
-      color: #856404;
-      padding: 1px 2px;
-      border-radius: 2px;
     }
     .search-excerpt {
+      color: var(--text-muted);
       font-size: 14px;
-      color: var(--text-summary);
+      margin: 0 0 8px 0;
       line-height: 1.5;
-      margin-bottom: 8px;
-    }
-    .search-excerpt mark {
-      background: #FFF3CD;
-      color: #856404;
-      padding: 1px 2px;
-      border-radius: 2px;
     }
     .search-meta {
       display: flex;
       gap: 12px;
       font-size: 12px;
-      color: #999;
+      color: var(--text-muted);
     }
     .search-video {
-      color: #FF8C42;
-    }
-    .hot-tags {
-      margin-top: 40px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .hot-tags-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-color);
-      margin-bottom: 12px;
+      color: #4CAF50;
     }
   </style>
 </body>
