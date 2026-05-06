@@ -288,3 +288,116 @@ function truncateText(text, maxLength) {
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
+
+
+// ===== 分享功能 =====
+
+function openSharePanel(title, url) {
+  // 移除已有面板
+  const existing = document.getElementById('sharePanel');
+  if (existing) existing.remove();
+  
+  // 存储分享信息
+  window._shareTitle = title || document.title;
+  window._shareUrl = url || window.location.href;
+  
+  // 创建面板
+  const panel = document.createElement('div');
+  panel.id = 'sharePanel';
+  panel.className = 'share-panel';
+  panel.innerHTML = `
+    <div class="share-panel-inner">
+      <div class="share-panel-header">
+        <span>分享</span>
+        <button class="share-close" onclick="closeSharePanel()">✕</button>
+      </div>
+      <div class="share-panel-body">
+        <button class="share-option" onclick="copyShareLink()">
+          <span class="share-icon">🔗</span><span>复制链接</span>
+        </button>
+        <button class="share-option" onclick="shareToWeibo()">
+          <span class="share-icon">📢</span><span>微博</span>
+        </button>
+        <button class="share-option" onclick="shareToQQ()">
+          <span class="share-icon">💬</span><span>QQ</span>
+        </button>
+        <button class="share-option" onclick="shareToTwitter()">
+          <span class="share-icon">🐦</span><span>Twitter</span>
+        </button>
+        <button class="share-option" onclick="shareToWechat()">
+          <span class="share-icon">💚</span><span>微信（复制链接发送）</span>
+        </button>
+      </div>
+    </div>
+  `;
+  
+  // 点击背景关闭
+  panel.addEventListener('click', function(e) {
+    if (e.target === panel) closeSharePanel();
+  });
+  
+  document.body.appendChild(panel);
+}
+
+function closeSharePanel() {
+  const panel = document.getElementById('sharePanel');
+  if (panel) panel.remove();
+}
+
+function copyShareLink() {
+  const url = window._shareUrl || window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showCopyToast());
+  } else {
+    // fallback
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    showCopyToast();
+  }
+}
+
+function showCopyToast() {
+  closeSharePanel();
+  const toast = document.createElement('div');
+  toast.className = 'copy-toast';
+  toast.textContent = '✓ 链接已复制';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 1500);
+}
+
+function shareToWeibo() {
+  const url = encodeURIComponent(window._shareUrl || window.location.href);
+  const title = encodeURIComponent(window._shareTitle || document.title);
+  window.open(`https://service.weibo.com/share/share.php?url=${url}&title=${title}`, '_blank');
+  closeSharePanel();
+}
+
+function shareToQQ() {
+  const url = encodeURIComponent(window._shareUrl || window.location.href);
+  const title = encodeURIComponent(window._shareTitle || document.title);
+  window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${url}&title=${title}`, '_blank');
+  closeSharePanel();
+}
+
+function shareToTwitter() {
+  const url = encodeURIComponent(window._shareUrl || window.location.href);
+  const text = encodeURIComponent(window._shareTitle || document.title);
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+  closeSharePanel();
+}
+
+function shareToWechat() {
+  copyShareLink();
+  // 额外提示
+  setTimeout(() => {
+    const toast = document.createElement('div');
+    toast.className = 'copy-toast';
+    toast.textContent = '请打开微信，粘贴链接发送';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  }, 1600);
+}
