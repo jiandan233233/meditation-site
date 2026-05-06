@@ -182,19 +182,93 @@ async function updateContentJson(data, message = '更新内容') {
 }
 
 /**
- * 上传媒体文件到仓库
- * 注意：GitHub Contents API 对文件大小有限制（约1MB base64编码后）
- * 因此限制为 5MB，超过则提示使用嵌入链接方式
+ * Git Data API 辅助函数
+ */
+
+/**
+ * 创建 Blob
+ * @param {string} content - base64 编码的内容
+ * @returns {Promise<string>} blob SHA
+ */
+async function createBlob(content) {
+  const data = await githubApi('POST', `/repos/${CONFIG.GITHUB_REPO}/git/blobs`, {
+    content: content,
+    encoding: 'base64'
+  });
+  return data.sha;
+}
+
+/**
+ * 获取 HEAD ref
+ * @returns {Promise<string>} commit SHA
+ */
+async function getHeadRef() {
+  const data = await githubApi('GET', `/repos/${CONFIG.GITHUB_REPO}/git/ref/heads/${CONFIG.GITHUB_BRANCH}`);
+  return data.object.sha;
+}
+
+/**
+ * 获取 commit 信息
+ * @param {string} commitSha - commit SHA
+ * @returns {Promise<object>} commit 对象
+ */
+async function getCommit(commitSha) {
+  return githubApi('GET', `/repos/${CONFIG.GITHUB_REPO}/git/commits/${commitSha}`);
+}
+
+/**
+ * 创建新 tree
+ * @param {string} baseTreeSha - 基础 tree SHA
+ * @param {Array} entries - 文件条目 [{ path, mode, type, sha }]
+ * @returns {Promise<string>} new tree SHA
+ */
+async function createTree(baseTreeSha, entries) {
+  const data = await githubApi('POST', `/repos/${CONFIG.GITHUB_REPO}/git/trees`, {
+    base_tree: baseTreeSha,
+    tree: entries
+  });
+  return data.sha;
+}
+
+/**
+ * 创建新 commit
+ * @param {string} message - commit 消息
+ * @param {string} treeSha - tree SHA
+ * @param {string} parentSha - parent commit SHA
+ * @returns {Promise<string>} new commit SHA
+ */
+async function createCommit(message, treeSha, parentSha) {
+  const data = await githubApi('POST', `/repos/${CONFIG.GITHUB_REPO}/git/commits`, {
+    message: message,
+    tree: treeSha,
+    parents: [parentSha]
+  });
+  return data.sha;
+}
+
+/**
+ * 更新 ref
+ * @param {string} ref - ref 路径，如 "heads/main"
+ * @param {string} sha - 新的 commit SHA
+ */
+async function updateRef(ref, sha) {
+  await githubApi('PATCH', `/repos/${CONFIG.GITHUB_REPO}/git/refs/${ref}`, {
+    sha: sha,
+    force: false
+  });
+}
+
+/**
+ * 上传媒体文件到仓库（使用 Git Data API，支持大文件）
+ * GitHub 仓库单文件上限 100MB，原始文件建议不超过 75MB
  */
 async function uploadMedia(file, directory) {
-  // 文件大小限制：5MB
-  const MAX_SIZE = 5 * 1024 * 1024;
+  // 文件大小限制：75MB（base64 编码后约 100MB，在 GitHub 限制内）
+  const MAX_SIZE = 75 * 1024 * 1024;
   
   if (file.size > MAX_SIZE) {
-    throw new Error('视频文件超过5MB限制。建议：\n1. 上传到B站后使用嵌入链接\n2. 或压缩视频后重试\n\n推荐使用B站嵌入，体验更好且无文件大小限制。');
+    throw new Error(`视频文件超过 ${MAX_SIZE / 1024 / 1024}MB 限制。请压缩视频后重试，或分段上传。`);
   }
-  
-  showLoading(`正在上传 ${file.name}...`);
   
   try {
     // 生成文件名
@@ -202,17 +276,42 @@ async function uploadMedia(file, directory) {
     const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
     const path = `${directory}/${filename}`;
     
-    // 转换为 base64
+    // 步骤1: 转换文件为 base64
+    showLoading('正在读取文件...');
     const base64Content = await fileToBase64(file);
     const base64Data = base64Content.split(',')[1];
     
-    const body = {
-      message: `上传媒体文件: ${file.name}`,
-      content: base64Data,
-      branch: CONFIG.GITHUB_BRANCH
-    };
-
-    await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
+    // 步骤2: 创建 Blob
+    showLoading('正在上传文件数据 (1/4)...');
+    const blobSha = await createBlob(base64Data);
+    
+    // 步骤3: 获取 HEAD commit SHA
+    showLoading('正在获取仓库信息 (2/4)...');
+    const headCommitSha = await getHeadRef();
+    
+    // 步骤4: 获取 commit 的 tree SHA
+    const commitData = await getCommit(headCommitSha);
+    const baseTreeSha = commitData.tree.sha;
+    
+    // 步骤5: 创建新 tree
+    showLoading('正在创建文件索引 (3/4)...');
+    const newTreeSha = await createTree(baseTreeSha, [{
+      path: path,
+      mode: '100644',
+      type: 'blob',
+      sha: blobSha
+    }]);
+    
+    // 步骤6: 创建新 commit
+    showLoading('正在保存到仓库 (4/4)...');
+    const newCommitSha = await createCommit(
+      `上传媒体文件: ${file.name}`,
+      newTreeSha,
+      headCommitSha
+    );
+    
+    // 步骤7: 更新 ref
+    await updateRef(`heads/${CONFIG.GITHUB_BRANCH}`, newCommitSha);
     
     // 返回 GitHub Pages URL
     const mediaUrl = `${CONFIG.GITHUB_PAGES_URL}/${directory}/${filename}`;
@@ -226,8 +325,7 @@ async function uploadMedia(file, directory) {
 }
 
 /**
- * 上传图片（内嵌在内容中的小图片）
- * 注意：小文件继续用 Contents API，超过1MB则提示
+ * 上传图片（内嵌在内容中的小图片）- 使用 Contents API
  */
 async function uploadInlineImage(file) {
   // 图片文件限制：1MB（base64后约1.37MB）
