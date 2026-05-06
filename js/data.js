@@ -351,8 +351,8 @@ async function uploadMedia(file, directory) {
     // 步骤7: 更新 ref
     await updateRef(`heads/${CONFIG.GITHUB_BRANCH}`, newCommitSha);
     
-    // 返回 CDN URL（支持 Range 请求，视频可流式播放）
-    const mediaUrl = `${CONFIG.MEDIA_CDN_URL}/${directory}/${filename}`;
+    // 返回 GitHub Pages URL（前端通过 blob 加载解决播放问题）
+    const mediaUrl = `${CONFIG.GITHUB_PAGES_URL}/${directory}/${filename}`;
     
     hideLoading();
     return mediaUrl;
@@ -392,7 +392,7 @@ async function uploadInlineImage(file) {
     await githubApi('PUT', `/repos/${CONFIG.GITHUB_REPO}/contents/${path}`, body);
     
     hideLoading();
-    return `${CONFIG.MEDIA_CDN_URL}/${path}`;
+    return `${CONFIG.GITHUB_PAGES_URL}/${path}`;
   } catch (e) {
     hideLoading();
     throw e;
